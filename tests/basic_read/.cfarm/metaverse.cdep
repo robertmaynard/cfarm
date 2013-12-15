@@ -1,0 +1,7 @@
+{
+"hostname" : "metaverse",
+"user" : "hiro",
+"src_location" : "/home/hiro/Work/metaverse/src",
+"build_location" : "/home/hiro/Work/metaverse/build",
+"build_flags" : "-j8"
+}
