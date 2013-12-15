@@ -66,14 +66,8 @@ def farm_worker_test(name):
 if __name__ == '__main__':
   #load up the farm, todo allow command options to set where the source dir is
   #todo we need command option parse to figure out what functions to call
-  farm = init_farm( "." )
-  print 'farm source dir: ', farm.repo().root()
 
-  worker_name = "metaverse"
-  worker = farm.worker(worker_name)
-
-  repo = farm.repo()
-  print repo.remote_exists('github')
+  print 'comming soon cfarm'
 
 
 
