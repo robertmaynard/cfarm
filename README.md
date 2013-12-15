@@ -40,15 +40,16 @@ The folder will look something like:
 ```
 
 Each .cdep file will describe how to deploy the project to a machine. This
-entails the following
+entails the following. Each file name is the cfarm workers name, allowing
+you to have multiple workers that point to the same host name.
 
-```
-"hostname" : "bigboard"
-"user" : "hiro"
-"src-location" : "/home/hiro/Work/metaverse/src"
-"build-location" : "/home/hiro/Work/metaverse/build"
-"build-flags" : "-j8"
-```
+{
+"hostname" : "bigboard",
+"user" : "hiro",
+"src_location" : "/home/hiro/Work/bigboard/src",
+"build_location" : "/home/hiro/Work/bigboard/build",
+"build_flags" : "-j8"
+}
 
 These settings are how cfarm determines where to place not only the source
 code of your project, but also where you want to build the project. Obviously
