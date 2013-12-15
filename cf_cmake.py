@@ -30,6 +30,7 @@ def get_project_root(path):
         for item in word_gen:
           if item in search_terms:
             #get the path and strip trailing and leading whitespace!
-            return word_gen.next().strip()
+            path = word_gen.next().strip()
+            return path
 
   return None

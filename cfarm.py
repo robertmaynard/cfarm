@@ -23,12 +23,13 @@ from fabric.api import env as fabric_env
 
 #given a path figure out which project we are in, this is
 #done by using git and cmakecache.txt parsing
-def find_farm(path):
+def find_git_repo(path):
   #get our cwd
-  root_path = git.get_project_root(path)
-  if not root_path:
+  repo = git.Repo(path)
+  if not repo.path:
     root_path = cmake.get_project_root(path)
-  return root_path
+    repo = git.Repo(root_path)
+  return repo
 
 #init a farm of workers
 def init_farm(working_dir):
@@ -36,12 +37,12 @@ def init_farm(working_dir):
   fabric_env.use_ssh_config = True
 
   #find the where .cfarm is located
-  farm_root = find_farm(working_dir)
+  repo = find_git_repo(working_dir)
 
   #parse the .cfarm directory that relates to the git repo we are located in
   # if no .cfarm, list short help, refer to github readme
   #build the collection of workers and set the initial state of each worker
-  return farm.Farm(farm_root)
+  return farm.Farm(repo)
 
 #init a single worker
 def farm_worker_setup(name):
@@ -66,13 +67,13 @@ if __name__ == '__main__':
   #load up the farm, todo allow command options to set where the source dir is
   #todo we need command option parse to figure out what functions to call
   farm = init_farm( "." )
-  print 'farm source dir: ', farm.source()
+  print 'farm source dir: ', farm.repo().root()
 
   worker_name = "metaverse"
   worker = farm.worker(worker_name)
 
-  git.remotes(farm.source())
-  git.remote_exists(farm.source(),'github')
+  repo = farm.repo()
+  print repo.remote_exists('github')
 
 
 

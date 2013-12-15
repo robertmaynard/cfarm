@@ -14,8 +14,8 @@ import json
 import os.path
 
 class Farm:
-  def __init__(self, sdir):
-    self.__source_dir = sdir
+  def __init__(self, repo):
+    self.__git_repo = repo
 
     #read the .cfarm directory parsing each file
     #with json creating a collection of workers
@@ -23,5 +23,8 @@ class Farm:
   def worker(self, wname):
     return None
 
-  def source(self):
-    return self.__source_dir
+  def repo(self):
+    return self.__git_repo
+
+  def source_dir(self):
+    pass
