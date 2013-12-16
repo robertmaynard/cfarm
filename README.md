@@ -48,6 +48,7 @@ you to have multiple workers that point to the same host name.
 "user" : "hiro",
 "src_location" : "/home/hiro/Work/bigboard/src",
 "build_location" : "/home/hiro/Work/bigboard/build",
+"build_generator" : "Ninja",
 "build_flags" : "-j8"
 }
 
