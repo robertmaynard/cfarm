@@ -2,8 +2,7 @@ This project is currently in design stage.
 
 ###CFarm###
 
-CFarm is a small project to help people develop cross platform c++ code
-quickly, by allowing them to build and test code on remote machine quickly
+CFarm is a small project to help people develop cross platform c++ code. By allowing them to build and test code on remote machine quickly
 
 
 ##Reason##

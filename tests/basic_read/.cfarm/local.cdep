@@ -3,5 +3,6 @@
 "user" : "robert",
 "src_location" : "/Users/robert/Work/temp/src",
 "build_location" : "/Users/robert/Work/temp/build",
+"build_generator" : "Ninja",
 "build_flags" : "-j2"
 }

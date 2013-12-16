@@ -62,6 +62,8 @@ class Repo:
   #remote_name is the name for this git remote
   #remote_url is the url for the new remote
   def add_remote(self, remote_name, remote_url):
+    if self.remote_exists(remote_name):
+      self.__git_call("remote", "rm", remote_name)
     self.__git_call("remote", "add", remote_name, remote_url)
 
   #return a list of all the remote repos that a git project has
@@ -82,7 +84,7 @@ class Repo:
   #push a local branch to a remote
   #ref is the branch name,SHA1, or other ref we want to push
   #remote_name is the remote we are pushing the branch to
-  def push(self, ref, remote_name):
+  def push(self, remote_name, ref ):
     #include porcelain so we can get parse-able output
     return self.__git_call("push", "--porcelain", remote_name, ref )
 
@@ -105,7 +107,7 @@ class Repo:
 #the user defined src directory
 class RemoteRepo:
   def __init__(self, cfWorker):
-    self.full_host = cfWorker.user + "@" + cfWorker.hostname
+    self.connection_name = cfWorker.connection_name
     self.src_location = cfWorker.src_location
     self.git_location = os.path.join(self.src_location, '.cfarm_worker')
 
@@ -115,7 +117,7 @@ class RemoteRepo:
 
   #creates a bare git repo at the current repos path
   def create_bare(self):
-    fabric_execute(self.__create_bare, host=self.full_host)
+    fabric_execute(self.__create_bare, host=self.connection_name)
 
   def __create_bare(self):
     command = "git init --bare " + self.git_location
@@ -126,7 +128,7 @@ class RemoteRepo:
   #to the latest git commit
   def install_hooks(self):
     #find the location of the template file
-    fabric_execute(self.__install_hooks, host=self.full_host)
+    fabric_execute(self.__install_hooks, host=self.connection_name)
 
   def __install_hooks(self):
     #get the location of the template file based on our location
@@ -144,5 +146,9 @@ class RemoteRepo:
 
     #upload and create the hooks
     fabric_template(template_file, destination=dest, context=context_dict)
+
+    #make the file executable
+    ch_command = "chmod +x " + dest + 'post-receive'
+    self.run(ch_command)
 
 

@@ -9,6 +9,16 @@ class FakeRepo:
   def __init__(self,fake_path):
     self.path = fake_path
 
+class NoCheckRepo(cfarm.git.Repo):
+  def __init__(self,path):
+    self.cd = fabric_lcd
+    self.run = fabric_local
+
+    self.path = path #setup path for project_root
+
+  def init(self):
+    return self.__git_call("init")
+
 
 #verify that we can do a simple test
 path = cfarm.cmake.get_project_root( "./tests/cmake_cache" )
@@ -19,6 +29,7 @@ repo = cfarm.git.Repo(path)
 print repo.remote_exists('github')
 print repo.remote_exists('origin')
 
+#fake a real git repo to verify json reading works
 farm2 = cfarm.farm.Farm(FakeRepo("./tests/basic_read"))
 
 worker_names = farm2.worker_names()
@@ -28,9 +39,8 @@ print 'bigboard' in worker_names
 
 workers = farm2.workers()
 
-remote_worker = [w for w in workers if w.name == 'local']
-if len(remote_worker) == 1:
-  remote_worker = remote_worker[0]
+if('local' in workers):
+  remote_worker = workers['local']
 
   #verify that we can create a bare repo
   #this is serial code
@@ -38,9 +48,12 @@ if len(remote_worker) == 1:
   remote_repo.create_bare()
   remote_repo.install_hooks()
 
-  #now we should add the remote repo to our local repo
+  #hook up a local repo to have that remote
+  new_repo = NoCheckRepo("./tests/dummy_repo")
+  new_repo.init()
 
-
+  #need to construct a remote url
+  new_repo.add_remote(remote_worker.name, remote_worker.git_url)
 
 
 

@@ -12,13 +12,52 @@
 #
 #=============================================================================
 
+import sys
+
 #import our helper functions
 import cf_git as git
 import cf_cmake as cmake
 import cf_worker as worker
 import cf_farm as farm
 
-from fabric.api import env as fabric_env
+def short_usage():
+  print 'CFarm growing C++ builds\n' + \
+  'usage cfarm.py [setup machine] [build machine(s)] [test] machine(s)]\n'+\
+  '\n'+\
+  'Examples:' + \
+  '\n'+\
+  '  cfarm setup deliverator\n'+\
+  '  cfarm build deliverator\n'+\
+  '  cfarm test bigboard metaverse\n'+\
+  '\n'
+
+def long_usage():
+  print short_usage()
+  print 'To use cfarm you need a setup a configuration per project. This is \n' + \
+  'done by creating a .cfarm folder in the root of your git repo that \n' + \
+  'you want cfarm to work on (Yes cfarm only supports git, I said cfarm \n' + \
+  'has no features). \n' + \
+  ' \n' + \
+  'The folder will look something like: \n' + \
+  ' \n' + \
+  '.cfarm/ \n' + \
+    '  - metaverse.cdep \n' + \
+    '  - deliverator.cdep \n' + \
+    '  - bigboard.cdep \n' + \
+  ' \n' + \
+  ' \n' + \
+  'Each .cdep file will describe how to deploy the project to a machine. This \n' + \
+  'entails the following. Each file name is the cfarm workers name, allowing \n' + \
+  'you to have multiple workers that point to the same host name. \n' + \
+  ' \n' + \
+  '{ \n' + \
+  '  "hostname" : "bigboard", \n' + \
+  '  "user" : "hiro", \n' + \
+  '  "src_location" : "/home/hiro/Work/bigboard/src", \n' + \
+  '  "build_location" : "/home/hiro/Work/bigboard/build", \n' + \
+  '  "build_generator" : "Ninja", \n' + \
+  '  "build_flags" : "-j8" \n' + \
+  '} \n'
 
 #given a path figure out which project we are in, this is
 #done by using git and cmakecache.txt parsing
@@ -32,8 +71,6 @@ def find_git_repo(path):
 
 #init a farm of workers
 def init_farm(working_dir):
-  #setup that we use ssh settings
-  fabric_env.use_ssh_config = True
 
   #find the where .cfarm is located
   repo = find_git_repo(working_dir)
@@ -43,30 +80,61 @@ def init_farm(working_dir):
   #build the collection of workers and set the initial state of each worker
   return farm.Farm(repo)
 
-#init a single worker
-def farm_worker_setup(name):
-  #take the worker from the farm that matches the name passed in
-  # if no worker found, send nice error stating so
-  #
-  # ssh into the user machine
-  #create a bare git directory in the source directory
-  #setup a post-receive hook to set the working directory
-  #to be equal to the
-  pass
+def setup(workers):
 
-#make a single work build
-def farm_worker_build(name):
-  pass
+  if 'all' in workers:
+    print "cfarm currently doesn't support the all keyword"
+    exit(2)
 
-#make a single work test
-def farm_worker_test(name):
-  pass
+  farm = init_farm(".")
+  if len(farm.workers()) == 0:
+    print 'no workers found, I think you are missing a .cdep folder'
+    long_usage()
+    exit(2)
 
+  for worker in workers:
+    farm.setup(worker)
+
+
+def build(workers):
+
+  if 'all' in workers:
+    print "cfarm currently doesn't support the all keyword"
+    exit(2)
+
+  farm = init_farm(".")
+  if len(farm.workers()) == 0:
+    print 'no workers found, I think you are missing a .cdep folder'
+    long_usage()
+    exit(2)
+
+  farm.build(workers)
+
+def test():
+  print 'currently not implemented'
 
 def main(argv):
-  #load up the farm, todo allow command options to set where the source dir is
-  #todo we need command option parse to figure out what functions to call
-  pass
+
+#setup arg function table
+  commands = {
+    'help':long_usage,
+    'setup':setup,
+    'build':build,
+    'test':test
+    }
+
+  #verify arg length
+  if len(argv) == 0:
+    short_usage()
+    sys.exit(2)
+
+  #call the correct function
+  if argv[0] in commands:
+    commands[argv[0]]( argv[1:] )
+  else:
+    short_usage()
+    sys.exit(2)
+
 
 if __name__ == '__main__':
   main(sys.argv[1:])

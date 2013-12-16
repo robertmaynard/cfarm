@@ -31,3 +31,5 @@ class Worker:
     #the class
     for key in j:
       self.__dict__[ key ] = j[key]
+
+    self.connection_name = self.user + "@" + self.hostname
