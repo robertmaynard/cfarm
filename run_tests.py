@@ -2,6 +2,9 @@
 
 import cfarm
 
+from fabric.api import env as fabric_env
+fabric_env.use_ssh_config = True
+
 class FakeRepo:
   def __init__(self,fake_path):
     self.path = fake_path
@@ -24,10 +27,21 @@ print 'metaverse' in worker_names
 print 'bigboard' in worker_names
 
 workers = farm2.workers()
-for w in workers:
-  print w.hostname
-  print w.user
-  print w.src_location
-  print w.build_location
-  print w.build_flags
+
+remote_worker = [w for w in workers if w.name == 'local']
+if len(remote_worker) == 1:
+  remote_worker = remote_worker[0]
+
+  #verify that we can create a bare repo
+  #this is serial code
+  remote_repo = cfarm.git.RemoteRepo(remote_worker)
+  remote_repo.create_bare()
+  remote_repo.install_hooks()
+
+  #now we should add the remote repo to our local repo
+
+
+
+
+
 

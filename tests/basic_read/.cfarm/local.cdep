@@ -1,0 +1,7 @@
+{
+"hostname" : "127.0.0.1",
+"user" : "robert",
+"src_location" : "/Users/robert/Work/temp/src",
+"build_location" : "/Users/robert/Work/temp/build",
+"build_flags" : "-j2"
+}

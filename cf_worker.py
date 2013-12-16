@@ -31,6 +31,3 @@ class Worker:
     #the class
     for key in j:
       self.__dict__[ key ] = j[key]
-
-
-    print dir(self)

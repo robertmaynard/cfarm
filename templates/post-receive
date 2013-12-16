@@ -1,0 +1,2 @@
+#!/bin/sh
+GIT_WORK_TREE=%(src_location)s git checkout -f

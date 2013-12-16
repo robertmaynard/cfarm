@@ -13,23 +13,26 @@
 
 from fabric.api import local as fabric_local
 from fabric.api import run as fabric_remote
+
+from fabric.contrib.files import upload_template as fabric_template
+from fabric.tasks import execute as fabric_execute
+
 from fabric.context_managers import lcd as fabric_lcd
 from fabric.context_managers import cd as fabric_rcd
 from fabric.context_managers import settings as fabric_settings
 from fabric.context_managers import hide,show
 
+import inspect
+import os.path
 
 
-#construct a local or remote repo, where
-#path is the path to git repo ( or where you want to create it ).
+
+#construct a local repo, where path is the path to git repo
 class Repo:
-  def __init__(self, path, remote=False):
-    if(remote):
-      self.cd = fabric_rcd
-      self.run = fabric_remote
-    else:
-      self.cd = fabric_lcd
-      self.run = fabric_local
+  def __init__(self, path):
+
+    self.cd = fabric_lcd
+    self.run = fabric_local
 
     self.path = path #setup path for project_root
     self.path = self.root() #find the proper root of the repo
@@ -41,11 +44,11 @@ class Repo:
     #fabric to fail if we aren't, so tell it to only warn.
     with fabric_settings(warn_only=True):
       with hide('warnings', 'status', 'running', 'stdout', 'stderr'):
-        string_path = self.__git_call("rev-parse","--show-toplevel")
+        result = self.__git_call("rev-parse","--show-toplevel")
     #string path will have newline sep, so strip them
-    if len(string_path)==0:
+    if result.failed:
       return None
-    return string_path.rstrip('\n\r')
+    return result.rstrip('\n\r')
 
 
   #
@@ -84,16 +87,6 @@ class Repo:
     return self.__git_call("push", "--porcelain", remote_name, ref )
 
 
-  #
-  #
-  # Init functions to create new git repos
-  #
-  #
-  #
-  #creates a bare git repo at the current repos path
-  def create_bare(self):
-    return self.__git_call("init","--bare")
-
   #helper function to call git commands
   #dict arg cwd is used to set where we call git commands from
   def __git_call(self, command, *args):
@@ -106,3 +99,50 @@ class Repo:
     #set the current working directory
     with self.cd(self.path):
         return self.run(invoke_command, capture=True)
+
+
+#Designed for setting up a bare remote repos that checkouts code in
+#the user defined src directory
+class RemoteRepo:
+  def __init__(self, cfWorker):
+    self.full_host = cfWorker.user + "@" + cfWorker.hostname
+    self.src_location = cfWorker.src_location
+    self.git_location = os.path.join(self.src_location, '.cfarm_worker')
+
+    self.cd = fabric_rcd
+    self.run = fabric_remote
+
+
+  #creates a bare git repo at the current repos path
+  def create_bare(self):
+    fabric_execute(self.__create_bare, host=self.full_host)
+
+  def __create_bare(self):
+    command = "git init --bare " + self.git_location
+    return self.run(command)
+
+
+  #install the hooks to automatically update the src-location of the worker
+  #to the latest git commit
+  def install_hooks(self):
+    #find the location of the template file
+    fabric_execute(self.__install_hooks, host=self.full_host)
+
+  def __install_hooks(self):
+    #get the location of the template file based on our location
+    this_file_loc = os.path.abspath(inspect.getfile(inspect.currentframe()))
+    current_dir = os.path.dirname( this_file_loc )
+    template_file = os.path.join(current_dir,'templates/post-receive')
+
+
+    #setup the destination of the hooks
+    dest = os.path.join(self.git_location,'hooks/')
+
+    #setup the template dictionary to create valid hooks
+    context_dict = { }
+    context_dict['src_location']=self.src_location
+
+    #upload and create the hooks
+    fabric_template(template_file, destination=dest, context=context_dict)
+
+

@@ -20,7 +20,6 @@ import cf_farm as farm
 
 from fabric.api import env as fabric_env
 
-
 #given a path figure out which project we are in, this is
 #done by using git and cmakecache.txt parsing
 def find_git_repo(path):
@@ -63,11 +62,14 @@ def farm_worker_build(name):
 def farm_worker_test(name):
   pass
 
-if __name__ == '__main__':
+
+def main(argv):
   #load up the farm, todo allow command options to set where the source dir is
   #todo we need command option parse to figure out what functions to call
+  pass
 
-  print 'comming soon cfarm'
+if __name__ == '__main__':
+  main(sys.argv[1:])
 
 
 
