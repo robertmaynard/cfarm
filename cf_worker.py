@@ -27,9 +27,14 @@ class Worker:
     f = open(path,'r')
     j = json.load(f)
 
+    #give optional arguments default values
+    self.build_flags = None
+    self.env_setup = None
+
     #now assign the properties in the json file as member variables of
     #the class
     for key in j:
       self.__dict__[ key ] = j[key]
 
+    #setup the connection name
     self.connection_name = self.user + "@" + self.hostname

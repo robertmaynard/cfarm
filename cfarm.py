@@ -78,49 +78,23 @@ def init_farm(working_dir):
   #parse the .cfarm directory that relates to the git repo we are located in
   # if no .cfarm, list short help, refer to github readme
   #build the collection of workers and set the initial state of each worker
-  return farm.Farm(repo)
-
-def setup(workers):
-
-  if 'all' in workers:
-    print "cfarm currently doesn't support the all keyword"
-    exit(2)
-
-  farm = init_farm(".")
-  if len(farm.workers()) == 0:
+  f = farm.Farm(repo)
+  if len(f.workers()) == 0:
     print 'no workers found, I think you are missing a .cdep folder'
     long_usage()
     exit(2)
-
-  for worker in workers:
-    farm.setup(worker)
-
-
-def build(workers):
-
-  if 'all' in workers:
-    print "cfarm currently doesn't support the all keyword"
-    exit(2)
-
-  farm = init_farm(".")
-  if len(farm.workers()) == 0:
-    print 'no workers found, I think you are missing a .cdep folder'
-    long_usage()
-    exit(2)
-
-  farm.build(workers)
-
-def test():
-  print 'currently not implemented'
+  return f
 
 def main(argv):
 
-#setup arg function table
+  farm = init_farm(".")
+
+  #setup arg function table
   commands = {
     'help':long_usage,
-    'setup':setup,
-    'build':build,
-    'test':test
+    'setup':farm.setup,
+    'build':farm.build,
+    'test':farm.test
     }
 
   #verify arg length
@@ -128,9 +102,15 @@ def main(argv):
     short_usage()
     sys.exit(2)
 
+  #support all by looking for it first and replacing
+  #the rest of the argv with just all known worker names
+  wnames = argv[1:]
+  if 'all' in wnames:
+    wnames = farm.worker_names()
+
   #call the correct function
   if argv[0] in commands:
-    commands[argv[0]]( argv[1:] )
+    commands[argv[0]]( wnames )
   else:
     short_usage()
     sys.exit(2)
@@ -138,13 +118,3 @@ def main(argv):
 
 if __name__ == '__main__':
   main(sys.argv[1:])
-
-
-
-
-
-
-
-
-
-

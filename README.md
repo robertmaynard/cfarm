@@ -1,5 +1,3 @@
-This project is currently in design stage.
-
 ###CFarm###
 
 CFarm is a small project to help people develop cross platform c++ code. By allowing them to build and test code on remote machine quickly
@@ -38,10 +36,11 @@ The folder will look something like:
   - bigboard.cdep
 ```
 
-Each .cdep file will describe how to deploy the project to a machine. This
-entails the following. Each file name is the cfarm workers name, allowing
-you to have multiple workers that point to the same host name.
+Each .cdep file will describe how to deploy the project to a machine.
+Each file name is the cfarm workers name, allowing you to have multiple workers
+that point to the same physical machine. Here is an example .cdep file:
 
+```
 {
 "hostname" : "bigboard",
 "user" : "hiro",
@@ -50,13 +49,20 @@ you to have multiple workers that point to the same host name.
 "build_generator" : "Ninja",
 "build_flags" : "-j8"
 }
+```
 
-These settings are how cfarm determines where to place not only the source
-code of your project, but also where you want to build the project. Obviously
-the hostname and user information are required to remotely start builds.
+Here is a list of required settings for a .cdep file:
+- hostname = computer name, or ip address of worker
+- user = the user we are going to log in as
+- src_location = the location to store the source for the current project
+- build_location = the location to build the project
+- build_generator = the cmake generator to use for building ( Make, Ninja, MSVC, ...)
 
-The hostname setting can be an ip address, a machine name or a host defined
-in your ssh config.
+Here is a list of optional settings for a .cdep file:
+- build_flags = list of flags for compilation, generally holds -j<N>
+- env_setup = path to a file we should run whenever we log into the remote
+              machine. This can be used to setup env flags, load the
+              proper modules, or setup vcvarsall.bat on windows machines.
 
 ##How to use cfarm##
 

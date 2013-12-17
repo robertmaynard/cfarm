@@ -1,10 +1,9 @@
-How to setup a windows machine as a cfarm worker
+##How to setup a Windows cfarm worker##
 
-CFarm requires machines to have a ssh daemon, git on the path and generally
-offer a POSIX interface. Now for windows machines this is fairly hard thing
-to do.
+cfarm requires machines to have a ssh daemon, git and cmake on the path and generally
+offer a POSIX interface. Now for windows machines this is requires some setup.
 
-So to setup windows CFarm workers I do the following:
+So to setup windows farm workers I do the following:
 
 ##OpenSSH##
 I install an ssh server, currently I am using copssh ( https://www.itefix.no/i2/copssh )
@@ -39,13 +38,60 @@ git. So all I did was copied git.exe from msysgit and dropped it into the
 Bin folder of ICW. You will need to also copy libiconv-2.dll also to the Bin
 folder for git to worker properly.
 
+We do this over setting up a bash_rc alias as aliases are not currently executed
+as we don't use an interactive shell
+
+##CMake##
+
+Make sure that cmake is on the path, I do this creating modifying my
+bash_rc file to extend my path variable:
+```
+export PATH=$PATH:/cygdrive/c/Program\ Files\ \(x86\)/CMake\ 2.8/bin/
+```
 
 ##Ninja##
 
-Todo:
-
+Make sure that ninja is on the path, I do this creating modifying my
+bash_rc file to extend my path variable:
+```
+export PATH=$PATH:/cygdrive/c/ninja/bin/
+```
 
 ##MSVC Vars##
 
-Todo:
+The current issue is that everything to setup msvc requires us to run
+something each time we log in. So what we do is add some bash functions
+
+```
+function run_in_vs_env
+{
+    eval vssetup="\$$1\\vsvars32.bat"
+    cmd /Q /C call "$vssetup" "&&" "${@:2}"
+}
+
+function run_vs11
+{
+    run_in_vs_env VS110COMNTOOLS "$@"
+}
+
+function run_vs10
+{
+    run_in_vs_env VS100COMNTOOLS "$@"
+}
+```
+
+Now the problem is that we need to run one of the following functions
+to get the correct version of msvc to run. Should we have a template file?
+how are we going to get the proper exports to run?
+
+```
+export -f run_in_vs_env
+export -f run_vs11
+```
+
+If we use fabric.prefix (http://docs.fabfile.org/en/1.8/api/core/context_managers.html#fabric.context_managers.prefix) with env_setup_cmd set to 'export -f run_vs11'
+we should be fine.
+
+See the following for more info on setting up msvc inside cygwin:
+http://stackoverflow.com/questions/366928/invoking-cl-exe-msvc-compiler-in-cygwin-shell
 http://fd-imaging.com/compiling-with-msvc-cygwin-and-qmake/
