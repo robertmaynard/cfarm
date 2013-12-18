@@ -121,7 +121,8 @@ class Farm:
       #to hostname we need to do some magic and work around
       #some of fabrics infrastructure
       host_list = [w.connection_name for w in workers]
-      fabric_execute(self.__build, workers, hosts=host_list)
+      with fabric_settings(parallel=True):
+        fabric_execute(self.__build, workers, hosts=host_list)
       return True
     return False
 
@@ -149,7 +150,8 @@ class Farm:
       #to hostname we need to do some magic and work around
       #some of fabrics infrastructure
       host_list = [w.connection_name for w in workers]
-      fabric_execute(self.__test, workers, hosts=host_list)
+      with fabric_settings(parallel=True):
+        fabric_execute(self.__test, workers, hosts=host_list)
       return True
     return False
 
