@@ -97,21 +97,12 @@ class Farm:
       command = "mkdir " +  worker.build_location
       fabric_run(command)
 
-    #run ccmake
-    with fabric_rcd(worker.build_location):
-
-      print '####################################################'
-      print 'Now running an interactive shell on the remote machine'
-      print 'You will need to manually exit the ssh connection!'
-      print '####################################################'
-      print ''
-      run_configure = fabric_prompt('Would you like to run ccmake: ', default='y', validate=r'^(y|n)$')
-
-      command = ""
-      if(run_configure == 'y'):
-        command = "ccmake -G " + worker.build_generator + " " + worker.src_location
-
-      fabric_shell(command)
+    #run ccmake if the user wants
+    run_configure = fabric_prompt('Would you like to run ccmake: ', default='y', validate=r'^(y|n)$')
+    if(run_configure == 'y'):
+      command = "ccmake -G " + worker.build_generator + " " + worker.src_location
+      with fabric_rcd(worker.build_location):
+        fabric_run(command)
 
 
   def build(self, worker_names):
