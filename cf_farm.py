@@ -108,9 +108,8 @@ class Farm:
   def build(self, worker_names):
     workers = self.push(worker_names)
     if workers:
-      #when we don't have a clear 1 to 1 mapping from names
-      #to hostname we need to do some magic and work around
-      #some of fabrics infrastructure
+      #if we have multiple workers that use the same host,
+      #that host will build each of those workers sequentially
       host_list = [w.connection_name for w in workers]
       with fabric_settings(parallel=True):
         fabric_execute(self.__build, workers, hosts=host_list)
@@ -120,26 +119,25 @@ class Farm:
   def __build(self, workers):
     my_host_name = fabric_env.host
 
-    #better only be 1
-    my_worker = [w for w in workers if w.hostname == my_host_name][0]
-    with fabric_rcd(my_worker.build_location):
-
-      #don't make a failed build a reason to abort
-      with fabric_settings(warn_only=True):
-        #build up build command
-        command = "cmake --build ."
-        #add in build flags if we have any
-        if(my_worker.build_flags != None):
-          command += " -- " + my_worker.build_flags
-        fabric_run(command)
+    valid_workers = [w for w in workers if w.hostname == my_host_name]
+    for w in valid_workers:
+      print 'building on worker:', w.name
+      with fabric_rcd(w.build_location):
+        #don't make a failed build a reason to abort
+        with fabric_settings(warn_only=True):
+          #build up build command
+          command = "cmake --build ."
+          #add in build flags if we have any
+          if(w.build_flags != None):
+            command += " -- " + w.build_flags
+          fabric_run(command)
 
 
   def test(self, worker_names):
     workers = self.push(worker_names)
     if workers:
-      #when we don't have a clear 1 to 1 mapping from names
-      #to hostname we need to do some magic and work around
-      #some of fabrics infrastructure
+      #if we have multiple workers that use the same host,
+      #that host will test each of those workers sequentially
       host_list = [w.connection_name for w in workers]
       with fabric_settings(parallel=True):
         fabric_execute(self.__test, workers, hosts=host_list)
@@ -150,10 +148,12 @@ class Farm:
     my_host_name = fabric_env.host
 
     #better only be 1
-    my_worker = [w for w in workers if w.hostname == my_host_name][0]
-    with fabric_rcd(my_worker.build_location):
-      with fabric_settings(warn_only=True):
-        fabric_run("ctest")
+    valid_workers = [w for w in workers if w.hostname == my_host_name]
+    for w in valid_workers:
+      print 'testing on worker:', w.name
+      with fabric_rcd(w.build_location):
+        with fabric_settings(warn_only=True):
+          fabric_run("ctest")
 
   def push(self, worker_names):
     #get the valid subset of workers from worker_names
