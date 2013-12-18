@@ -20,7 +20,7 @@ import cf_cmake as cmake
 import cf_worker as worker
 import cf_farm as farm
 
-def short_usage():
+def short_usage( all_worker_names ):
   print 'CFarm growing C++ builds\n' + \
   'usage cfarm.py [setup machine] [build machine(s)] [test] machine(s)]\n'+\
   '\n'+\
@@ -28,11 +28,15 @@ def short_usage():
   '\n'+\
   '  cfarm setup deliverator\n'+\
   '  cfarm build deliverator\n'+\
-  '  cfarm test bigboard metaverse\n'+\
-  '\n'
+  '  cfarm test bigboard metaverse\n'
 
-def long_usage():
-  print short_usage()
+  if all_worker_names != None:
+    print 'Current workers:'
+    for w in all_worker_names:
+      print ' -',w
+
+def long_usage( ):
+  short_usage( None )
   print 'To use cfarm you need a setup a configuration per project. This is \n' + \
   'done by creating a .cfarm folder in the root of your git repo that \n' + \
   'you want cfarm to work on (Yes cfarm only supports git, I said cfarm \n' + \
@@ -80,8 +84,8 @@ def init_farm(working_dir):
   #build the collection of workers and set the initial state of each worker
   f = farm.Farm(repo)
   if len(f.workers()) == 0:
-    print 'no workers found, I think you are missing a .cdep folder'
     long_usage()
+    print 'no workers found, I think you are missing a .cdep folder'
     exit(2)
   return f
 
@@ -91,28 +95,32 @@ def main(argv):
 
   #setup arg function table
   commands = {
-    'help':long_usage,
     'setup':farm.setup,
     'build':farm.build,
     'test':farm.test
     }
 
-  #verify arg length
+  all_worker_names = farm.worker_names()
+
+  #at this point we have a valid farm
+  #verify arg length, be helpful and list current workers
   if len(argv) == 0:
-    short_usage()
+    short_usage( all_worker_names  )
     sys.exit(2)
 
   #support all by looking for it first and replacing
   #the rest of the argv with just all known worker names
   wnames = argv[1:]
   if 'all' in wnames:
-    wnames = farm.worker_names()
+    wnames = all_worker_names
 
   #call the correct function
-  if argv[0] in commands:
+  if argv[0] == 'help':
+    short_usage( all_worker_names )
+  elif argv[0] in commands:
     commands[argv[0]]( wnames )
   else:
-    short_usage()
+    short_usage( all_worker_names )
     sys.exit(2)
 
 
