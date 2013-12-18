@@ -63,11 +63,11 @@ class Farm:
       print 'setting up worker: ', worker_name
       worker = self.__workers[worker_name]
       #
-      #create a bare git directory under the source directory
+      #create a git directory under the source directory
       #setup a post-receive hook to set the working directory
       #to be equal to the source directory
       worker_repo = cf_git.RemoteRepo(worker)
-      worker_repo.create_bare()
+      worker_repo.create()
       worker_repo.install_hooks()
       #
       #now we have to add the worker as a git remote

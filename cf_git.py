@@ -109,20 +109,23 @@ class RemoteRepo:
   def __init__(self, cfWorker):
     self.connection_name = cfWorker.connection_name
     self.src_location = cfWorker.src_location
-    self.git_location = os.path.join(self.src_location, '.cfarm_worker')
+    self.git_location = os.path.join(self.src_location, '.git')
 
     self.cd = fabric_rcd
     self.run = fabric_remote
 
 
   #creates a bare git repo at the current repos path
-  def create_bare(self):
-    fabric_execute(self.__create_bare, host=self.connection_name)
+  def create(self):
+    fabric_execute(self.__create, host=self.connection_name)
 
-  def __create_bare(self):
-    command = "git init --bare " + self.git_location
-    return self.run(command)
-
+  def __create(self):
+    #make the directory a git repo
+    self.run("git init " + self.src_location)
+    #move into the repo
+    with self.cd(self.git_location):
+      self.run("git config --bool receive.denyCurrentBranch false")
+      self.run("git config --path core.worktree " + self.src_location)
 
   #install the hooks to automatically update the src-location of the worker
   #to the latest git commit

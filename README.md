@@ -93,11 +93,10 @@ The build and test command have two ways to be called:
 ##What cfarm is doing##
 
 When you call setup cfarm ssh's in to the remote machine and enters the
-source directory where it will create a subdirectory called .cfarm_worker,
-this hidden directory is a bare git repository. We than configure a post_recieve
-hook that sets the working directory for the bare git repo to be the source
-directory. This setup means that we can always push commits without worry,
-and can send patches easily to the machine.
+source directory where it will create a git repo with an explicit working
+tree. We than configure a post_recieve hook that sets up the working directory
+and updates / inits all submodules. This setup means that we can always push
+commits without worry, and can send patches easily to the machine.
 
 Next setup will push the master branch of your repository to the machine
 you have setup.
