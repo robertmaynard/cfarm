@@ -65,6 +65,13 @@ files that convert the vc env settings to bash settings. The other
 options is somehow writing our own prompt that will set the proper 
 env flags before forwarding to bash.
 
+The other option is to look into freeSSHD which provides a
+cmd shell option. From that point we can use the fabric prefix to specify the
+compiler we want ( msvc ver + x86 | amd64 ). I think this might be the best
+option to get everything to work cleanly.
+
+Fabric Prefix:
+http://docs.fabfile.org/en/1.8/api/core/context_managers.html#fabric.context_managers.prefix
 
 See the following for more info on setting up msvc inside cygwin:
 http://doc36.controltier.org/wiki/CopSSH_(windows)
