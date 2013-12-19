@@ -60,38 +60,13 @@ export PATH=$PATH:/cygdrive/c/ninja/bin/
 ##MSVC Vars##
 
 The current issue is that everything to setup msvc requires us to run
-something each time we log in. So what we do is add some bash functions
+something each time we log in. What we need to do is create some template
+files that convert the vc env settings to bash settings. The other
+options is somehow writing our own prompt that will set the proper 
+env flags before forwarding to bash.
 
-```
-function run_in_vs_env
-{
-    eval vssetup="\$$1\\vsvars32.bat"
-    cmd /Q /C call "$vssetup" "&&" "${@:2}"
-}
-
-function run_vs11
-{
-    run_in_vs_env VS110COMNTOOLS "$@"
-}
-
-function run_vs10
-{
-    run_in_vs_env VS100COMNTOOLS "$@"
-}
-```
-
-Now the problem is that we need to run one of the following functions
-to get the correct version of msvc to run. Should we have a template file?
-how are we going to get the proper exports to run?
-
-```
-export -f run_in_vs_env
-export -f run_vs11
-```
-
-If we use fabric.prefix (http://docs.fabfile.org/en/1.8/api/core/context_managers.html#fabric.context_managers.prefix) with env_setup_cmd set to 'export -f run_vs11'
-we should be fine.
 
 See the following for more info on setting up msvc inside cygwin:
+http://doc36.controltier.org/wiki/CopSSH_(windows)
 http://stackoverflow.com/questions/366928/invoking-cl-exe-msvc-compiler-in-cygwin-shell
 http://fd-imaging.com/compiling-with-msvc-cygwin-and-qmake/
