@@ -108,9 +108,22 @@ def main(argv):
     short_usage( all_worker_names  )
     sys.exit(2)
 
+  #extract all worker names from the list, and extract everything
+  #after -- to be arguments to pass to the function call
+  wnames = []
+  args = []
+
+  try:
+    arg_index = argv.index('--')
+  except Exception, e:
+    wnames = argv[1:]
+  else:
+    wnames = argv[1:arg_index]
+    if len(argv) > arg_index+1:
+      args = argv[arg_index+1:]
+
   #support all by looking for it first and replacing
   #the rest of the argv with just all known worker names
-  wnames = argv[1:]
   if 'all' in wnames:
     wnames = all_worker_names
 
@@ -118,7 +131,7 @@ def main(argv):
   if argv[0] == 'help':
     short_usage( all_worker_names )
   elif argv[0] in commands:
-    commands[argv[0]]( wnames )
+    commands[argv[0]]( wnames, args )
   else:
     short_usage( all_worker_names )
     sys.exit(2)

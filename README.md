@@ -89,6 +89,24 @@ The build and test command have two ways to be called:
  cfarm test bigboard metaverse
 ```
 
+cfarm also allows you to sent options down to the workers at build
+and test time, it does this by sending all arguments passed after the
+first '--' down to the command line.
+
+So to specify a specific target for all workers to build you would use the
+following command line:
+
+```
+cfarm build all -- --target Sword
+```
+
+To specify to run tests that match a ctest regular expression you would
+use:
+
+```
+cfarm test all -- -R UnitTestSword
+```
+
 
 ##What cfarm is doing##
 

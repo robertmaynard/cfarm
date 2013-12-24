@@ -50,26 +50,6 @@
    can be told which config to use. Maybe also think about adding a working
    setting called build_config which will be the default
 
-6. Teach the build command about --target so that workers will only build
-   a specified target
-
-7. Teach the test command about -R, and -VV which will allow us run only certain
-   things.
-
-8. Combine 6 && 7 into a single task where we allow forwarding of args
-   after the list of workers, so something like this:
-
-   ```
-   cfarm build all --target Sword --clean-first
-
-   cfarm test metaverse bigboard -R Delivery -VV
-
-   ```
-
-   Do we just forward everything after the first -? to each worker, or
-   do we make the user use something like -- to state that remaining options
-   go to the worker?
-
 9. Automatically send modifications in the current git repo to the machines
    when invoking the build command. Will require us to run some pretty fancy
    git commands to package up the changes and push it without changing any git

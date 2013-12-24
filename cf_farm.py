@@ -52,7 +52,11 @@ class Farm:
     return self.__source_dir
 
   #Returns if the setup worked or not
-  def setup(self,worker_names):
+  def setup(self,worker_names, user_setup_args):
+    if len(user_setup_args) > 0:
+      print 'unable to support user defined args for setup currently'
+      return
+
     for worker_name in worker_names:
       #take the worker from the farm that matches the name passed in
       # if no worker found, send nice error stating so
@@ -105,46 +109,59 @@ class Farm:
         fabric_run(command)
 
 
-  def build(self, worker_names):
+  def build(self, worker_names, user_build_args):
+    user_args = " ".join(user_build_args)
+
     workers = self.push(worker_names)
     if workers:
       #if we have multiple workers that use the same host,
       #that host will build each of those workers sequentially
       host_list = [w.connection_name for w in workers]
       with fabric_settings(parallel=True):
-        fabric_execute(self.__build, workers, hosts=host_list)
+        fabric_execute(self.__build, workers, user_args, hosts=host_list)
       return True
     return False
 
-  def __build(self, workers):
+  def __build(self, workers, user_args):
     my_host_name = fabric_env.host
 
     valid_workers = [w for w in workers if w.hostname == my_host_name]
     for w in valid_workers:
       print 'building on worker:', w.name
+
+      #add the build flags to the front of the tool args
+      #if they exist
+      tool_args = ""
+      if(w.build_flags != None):
+        tool_args = w.build_flags
+
       with fabric_rcd(w.build_location):
         #don't make a failed build a reason to abort
         with fabric_settings(warn_only=True):
           #build up build command
           command = "cmake --build ."
-          #add in build flags if we have any
-          if(w.build_flags != None):
-            command += " -- " + w.build_flags
+          command += " " + user_args
+          if len(tool_args) > 0:
+            command += " -- " + tool_args
+
           fabric_run(command)
 
 
-  def test(self, worker_names):
+  def test(self, worker_names, user_test_args):
+    print user_test_args
+    user_args = " ".join(user_test_args)
+
     workers = self.push(worker_names)
     if workers:
       #if we have multiple workers that use the same host,
       #that host will test each of those workers sequentially
       host_list = [w.connection_name for w in workers]
       with fabric_settings(parallel=True):
-        fabric_execute(self.__test, workers, hosts=host_list)
+        fabric_execute(self.__test, workers, user_args, hosts=host_list)
       return True
     return False
 
-  def __test(self, workers):
+  def __test(self, workers, user_args):
     my_host_name = fabric_env.host
 
     #better only be 1
@@ -153,7 +170,7 @@ class Farm:
       print 'testing on worker:', w.name
       with fabric_rcd(w.build_location):
         with fabric_settings(warn_only=True):
-          fabric_run("ctest")
+          fabric_run("ctest " + user_args)
 
   def push(self, worker_names):
     #get the valid subset of workers from worker_names
