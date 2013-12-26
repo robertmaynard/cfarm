@@ -1,6 +1,8 @@
 ###CFarm###
 
-CFarm is a small project to help people develop cross platform c++ code. By allowing them to build and test code on remote machine quickly
+CFarm goal is to keep numerous machines in sync when developing cross platform
+C++ projects. You can think of a private continuous testing, without any fancy
+reporting, user interface, or other 'features' that other tools have.
 
 
 ##Reason##
@@ -17,9 +19,6 @@ Likewise I generally switch between machines to replicate these breaks,
 and every time I do that I need to recheck out the code and generally go
 through the entire configuration, compilation, test process.
 
-The goal of cfarm is to keep numerous machines in sync when developing
-on a project. You can think of a private continuous testing, without any fancy
-reporting, user interface, or other 'features' that other tools have.
 
 ##Setup Development Machine##
 
@@ -57,12 +56,11 @@ Here is a list of required settings for a .cdep file:
 - src_location = the location to store the source for the current project
 - build_location = the location to build the project
 - build_generator = the cmake generator to use for building ( Make, Ninja, MSVC, ...)
+                    Currently MSVC is not recommend since you will have to manually
+                    specify the configuration type ( Debug, Release, ...) at each build
 
 Here is a list of optional settings for a .cdep file:
 - build_flags = list of flags for compilation, generally holds -j<N>
-- env_setup = path to a file we should run whenever we log into the remote
-              machine. This can be used to setup env flags, load the
-              proper modules, or setup vcvarsall.bat on windows machines.
 
 ##How to use cfarm##
 
@@ -106,28 +104,6 @@ use:
 ```
 cfarm test all -- -R UnitTestSword
 ```
-
-
-##What cfarm is doing##
-
-When you call setup cfarm ssh's in to the remote machine and enters the
-source directory where it will create a git repo with an explicit working
-tree. We than configure a post_recieve hook that sets up the working directory
-and updates / inits all submodules. This setup means that we can always push
-commits without worry, and can send patches easily to the machine.
-
-Next setup will push the master branch of your repository to the machine
-you have setup.
-
-Lastly we open a remote connection to the machine, move into the build
-directory and invoke ccmake so that you can configure the build directory.
-
-When you call build, cfarm does the following:
-  1. finds the remotes you requested and pushes the commits to those machines
-     this triggers the remote to checkout that code
-  2. ssh into the machine and run cmake --build -- ${build-flags}
-Todo: we need to be able to flag that a remote machine has finished checking
-out the code we pushed before we try build.
 
 ##Requirements##
 
