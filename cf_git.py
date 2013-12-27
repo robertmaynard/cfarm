@@ -1,3 +1,4 @@
+
 #=============================================================================
 #
 #  Copyright (c) Kitware, Inc.
@@ -28,7 +29,7 @@ import os.path
 
 
 #construct a local repo, where path is the path to git repo
-class Repo:
+class Repo(object):
   def __init__(self, path):
 
     self.cd = fabric_lcd
@@ -105,7 +106,7 @@ class Repo:
 
 #Designed for setting up a bare remote repos that checkouts code in
 #the user defined src directory
-class RemoteRepo:
+class RemoteRepo(object):
   def __init__(self, cfWorker):
     self.connection_name = cfWorker.connection_name
     self.src_location = cfWorker.src_location

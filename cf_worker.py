@@ -13,7 +13,7 @@
 import os.path
 import json
 
-class Worker:
+class Worker(object):
 
   def __init__(self, path):
     self.__read_worker(path)

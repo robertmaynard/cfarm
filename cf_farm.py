@@ -26,7 +26,7 @@ import cf_worker
 import cf_git
 
 
-class Farm:
+class Farm(object):
   def __init__(self, repo):
 
     #setup that we use ssh settings
@@ -148,7 +148,6 @@ class Farm:
 
 
   def test(self, worker_names, user_test_args):
-    print user_test_args
     user_args = " ".join(user_test_args)
 
     workers = self.push(worker_names)
