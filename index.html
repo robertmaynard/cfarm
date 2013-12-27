@@ -87,13 +87,16 @@ that point to the same physical machine. Here is an example .cdep file:</p>
 <li>user = the user we are going to log in as</li>
 <li>src_location = the location to store the source for the current project</li>
 <li>build_location = the location to build the project</li>
-<li>build_generator = the cmake generator to use for building ( Make, Ninja, MSVC, ...)
-                Currently MSVC is not recommend since you will have to manually
-                specify the configuration type ( Debug, Release, ...) at each build</li>
+<li>build_generator = the CMake generator to use for building.
+All CMake generators are currently supported. For Generators like Visual Studio
+you will also need to specify the option build_configuration option.</li>
 </ul><p>Here is a list of optional settings for a .cdep file:</p>
 
 <ul>
-<li>build_flags = list of flags for compilation, generally holds -j</li>
+<li>build_flags = list of flags for compilation, generally holds '-j'</li>
+<li>build_configuration = Explicitly state the build configuration type
+to use such as Debug, or Release. Needed when you are using multi
+configuration generators like Visual Studio.</li>
 </ul><h2>
 <a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use cfarm</h2>
 
