@@ -1,22 +1,15 @@
 ##Todo##
 
-1. Implement env_setup and be able to source a user provided file
-   before calling configure, build, and test. We might need to setup
-   three options called:
+1. Implement two new options called 'build_env' and 'test_env'. These
+   are called using fabric.prefix before we run build and test
 
-   configure_env
    build_env
    test_env
 
-2. Properly setup a windows worker and finish documenting how this is
-   done by using a configure and build env file
-
-
-3. setup a linux worker that exports a X display when running tests.
-
-
-4. Investigate setting up template files for the configure, build, and test
-   env.
+   A good test is showing how to setup a linux worker to export 
+   an X display for running test ( export :0.0 )
+   
+   What about setting up template files for the build, and test env.
 
    For a linux machine we would have the following:
    ````
@@ -29,28 +22,27 @@
    ````
    Which source a remote file.
 
-   For a windows machine that needs to setup visual studio we need
-   more options, so maybe we offer some basic templating support?
+2. We need a way to state Visual Studio Generators plus Config.
+   How about something like this:
 
    ````
    {
     ...
-    "build_generator" : "Ninja",
-    "build_flags" : "-j8"
-    "configure_env" : ["template": "WindowsMSVC", "version": "11"]
-    "build_env" : ["template": "WindowsMSVC", "version" : "11"]
+    "build_generator" : "Visual Studio 10 Win64 Release"
+    
    }
-   ````
+   ````   
+   
+   We can parse that to determine the proper config option to pass
+   down to cmake --build.
 
-   We than need to specify a location where we are going to place
-   the templated files on the remote machine. Maybe hide them somewhere
-   in the source dir, such as .cworker_env/*?
+   Trying to break the setup into OS,Generator,Version,Architecture,...
+   seems to be pointless since the configure step is so abitrary that
+   every machine will need special flags. Remember cfarm is aiming
+   to only cover the standard use case, screw edge cases.
 
-5. Teach the build command about --config so that window visual studio workers
-   can be told which config to use. Maybe also think about adding a working
-   setting called build_config which will be the default
 
-9. Automatically send modifications in the current git repo to the machines
+3. Automatically send modifications in the current git repo to the machines
    when invoking the build command. Will require us to run some pretty fancy
    git commands to package up the changes and push it without changing any git
    history on the client.
