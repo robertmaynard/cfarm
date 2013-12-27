@@ -132,15 +132,22 @@ class Farm(object):
       #add the build flags to the front of the tool args
       #if they exist
       tool_args = ""
-      if(w.build_flags != None):
+      if w.build_flags != None:
         tool_args = w.build_flags
+
+      config_type = ""
+      if w.build_configuration != None:
+        config_type = w.build_configuration
 
       with fabric_rcd(w.build_location):
         #don't make a failed build a reason to abort
         with fabric_settings(warn_only=True):
           #build up build command
           command = "cmake --build ."
-          command += " " + user_args
+          if len(config_type) > 0:
+            command += " " + config_type
+          if len(user_args) > 0:
+            command += " " + user_args
           if len(tool_args) > 0:
             command += " -- " + tool_args
 

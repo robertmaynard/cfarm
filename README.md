@@ -55,12 +55,14 @@ Here is a list of required settings for a .cdep file:
 - user = the user we are going to log in as
 - src_location = the location to store the source for the current project
 - build_location = the location to build the project
-- build_generator = the cmake generator to use for building ( Make, Ninja, MSVC, ...)
-                    Currently MSVC is not recommend since you will have to manually
-                    specify the configuration type ( Debug, Release, ...) at each build
+- build_generator = the CMake generator to use for building.
+All CMake generators are currently supported. For Generators like Visual Studio
+you will also need to specify the option build_configuration option.
 
 Here is a list of optional settings for a .cdep file:
-- build_flags = list of flags for compilation, generally holds -j<N>
+- build_flags = list of flags for compilation, generally holds '-j<N>'
+- build_configuration = Explicitly state the build configuration type
+                        to use
 
 ##How to use cfarm##
 

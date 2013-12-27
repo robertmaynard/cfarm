@@ -27,9 +27,9 @@ class Worker(object):
     f = open(path,'r')
     j = json.load(f)
 
-    #give optional arguments default values
+    #give optional arguments default values of nothing
     self.build_flags = None
-    self.env_setup = None
+    self.build_configuration = None
 
     #now assign the properties in the json file as member variables of
     #the class
