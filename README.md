@@ -62,7 +62,9 @@ you will also need to specify the option build_configuration option.
 Here is a list of optional settings for a .cdep file:
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
-                        to use
+to use such as Debug, or Release. Needed when you are using multi
+configuration generators like Visual Studio.
+
 
 ##How to use cfarm##
 
