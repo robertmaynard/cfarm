@@ -13,13 +13,13 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Cfarm by robertmaynard</title>
+    <title>CFarm by robertmaynard</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-        <h1>Cfarm</h1>
+        <h1>CFarm</h1>
         <h2>Making cross-platform development faster.</h2>
         <a href="https://github.com/robertmaynard/cfarm" class="button"><small>View project on</small>GitHub</a>
       </div>
@@ -53,9 +53,9 @@ through the entire configuration, compilation, test process.</p>
 <h2>
 <a name="setup-development-machine" class="anchor" href="#setup-development-machine"><span class="octicon octicon-link"></span></a>Setup Development Machine</h2>
 
-<p>To use cfarm you need a setup a configuration per project. This is
+<p>To use CFarm you need a setup a configuration per project. This is
 done by creating a .cfarm folder in the root of your git repo that
-you want cfarm to work on (Yes cfarm only supports git, I said cfarm
+you want CFarm to work on (Yes CFarm only supports git, I said CFarm
 has no features).</p>
 
 <p>The folder will look something like:</p>
@@ -67,7 +67,7 @@ has no features).</p>
 </code></pre>
 
 <p>Each .cdep file will describe how to deploy the project to a machine.
-Each file name is the cfarm workers name, allowing you to have multiple workers
+Each file name is the CFarm workers name, allowing you to have multiple workers
 that point to the same physical machine. Here is an example .cdep file:</p>
 
 <pre><code>{
@@ -98,9 +98,9 @@ you will also need to specify the option build_configuration option.</li>
 to use such as Debug, or Release. Needed when you are using multi
 configuration generators like Visual Studio.</li>
 </ul><h2>
-<a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use cfarm</h2>
+<a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use CFarm</h2>
 
-<p>cfarm understands the concepts of setup, build, and test.</p>
+<p>CFarm understands the concepts of setup, build, and test.</p>
 
 <p>The Setup command looks like:</p>
 
@@ -121,7 +121,7 @@ configure options</p>
  cfarm test bigboard metaverse
 </code></pre>
 
-<p>cfarm also allows you to sent options down to the workers at build
+<p>CFarm also allows you to sent options down to the workers at build
 and test time, it does this by sending all arguments passed after the
 first '--' down to the command line.</p>
 
