@@ -29,36 +29,117 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="cfarm" class="anchor" href="#cfarm"><span class="octicon octicon-link"></span></a>CFarm</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>CFarm goal is to keep numerous machines in sync when developing cross platform
+C++ projects. You can think of a private continuous testing, without any fancy
+reporting, user interface, or other 'features' that other tools have.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<h2>
+<a name="reason" class="anchor" href="#reason"><span class="octicon octicon-link"></span></a>Reason</h2>
+
+<p>The standard problem I have is when developing on a single platform,
+I introduce subtle cross platform breaking code, things like using
+c99 types, or using a C++11 method from stl.</p>
+
+<p>Now I can commit these breaks, and send the branch for review where
+it will get sniffed out and reported, but the turnaround for that is
+incredibly high.</p>
+
+<p>Likewise I generally switch between machines to replicate these breaks,
+and every time I do that I need to recheck out the code and generally go
+through the entire configuration, compilation, test process.</p>
+
+<h2>
+<a name="setup-development-machine" class="anchor" href="#setup-development-machine"><span class="octicon octicon-link"></span></a>Setup Development Machine</h2>
+
+<p>To use cfarm you need a setup a configuration per project. This is
+done by creating a .cfarm folder in the root of your git repo that
+you want cfarm to work on (Yes cfarm only supports git, I said cfarm
+has no features).</p>
+
+<p>The folder will look something like:</p>
+
+<pre><code>.cfarm/
+  - metaverse.cdep
+  - deliverator.cdep
+  - bigboard.cdep
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Each .cdep file will describe how to deploy the project to a machine.
+Each file name is the cfarm workers name, allowing you to have multiple workers
+that point to the same physical machine. Here is an example .cdep file:</p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<pre><code>{
+"hostname" : "bigboard",
+"user" : "hiro",
+"src_location" : "/home/hiro/Work/bigboard/src",
+"build_location" : "/home/hiro/Work/bigboard/build",
+"build_generator" : "Ninja",
+"build_flags" : "-j8"
+}
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Here is a list of required settings for a .cdep file:</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<ul>
+<li>hostname = computer name, or ip address of worker</li>
+<li>user = the user we are going to log in as</li>
+<li>src_location = the location to store the source for the current project</li>
+<li>build_location = the location to build the project</li>
+<li>build_generator = the cmake generator to use for building ( Make, Ninja, MSVC, ...)
+                Currently MSVC is not recommend since you will have to manually
+                specify the configuration type ( Debug, Release, ...) at each build</li>
+</ul><p>Here is a list of optional settings for a .cdep file:</p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<ul>
+<li>build_flags = list of flags for compilation, generally holds -j</li>
+</ul><h2>
+<a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use cfarm</h2>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<p>cfarm understands the concepts of setup, build, and test.</p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>The Setup command looks like:</p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<pre><code>cfarm setup metaverse
+</code></pre>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>As it only supports setting up machines one by one. This is required as we
+currently launch ccmake on the machine to allow you to configure the starting
+building options. Todo: Allow the user to resetup a machine to switch just
+configure options</p>
+
+<p>The build and test command have two ways to be called:</p>
+
+<pre><code> cfarm build all
+ cfarm build deliverator
+
+ cfarm test all
+ cfarm test bigboard metaverse
+</code></pre>
+
+<p>cfarm also allows you to sent options down to the workers at build
+and test time, it does this by sending all arguments passed after the
+first '--' down to the command line.</p>
+
+<p>So to specify a specific target for all workers to build you would use the
+following command line:</p>
+
+<pre><code>cfarm build all -- --target Sword
+</code></pre>
+
+<p>To specify to run tests that match a ctest regular expression you would
+use:</p>
+
+<pre><code>cfarm test all -- -R UnitTestSword
+</code></pre>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<pre><code>Python 2.6 or 2.7
+Fabric
+</code></pre>
         </section>
 
         <aside id="sidebar">
