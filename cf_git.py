@@ -45,7 +45,7 @@ class Repo(object):
     #fabric to fail if we aren't, so tell it to only warn.
     with fabric_settings(warn_only=True):
       with hide('warnings', 'status', 'running', 'stdout', 'stderr'):
-        result = self.__git_call("rev-parse","--show-toplevel")
+        result = self.git_call("rev-parse","--show-toplevel")
     #string path will have newline sep, so strip them
     if result.failed:
       return None
@@ -64,12 +64,12 @@ class Repo(object):
   #remote_url is the url for the new remote
   def add_remote(self, remote_name, remote_url):
     if self.remote_exists(remote_name):
-      self.__git_call("remote", "rm", remote_name)
-    self.__git_call("remote", "add", remote_name, remote_url)
+      self.git_call("remote", "rm", remote_name)
+    self.git_call("remote", "add", remote_name, remote_url)
 
   #return a list of all the remote repos that a git project has
   def remotes(self):
-    remotes = self.__git_call("remote")
+    remotes = self.git_call("remote")
     return remotes.split()
 
   def remote_exists(self, remote):
@@ -87,12 +87,12 @@ class Repo(object):
   #remote_name is the remote we are pushing the branch to
   def push(self, remote_name, ref ):
     #include porcelain so we can get parse-able output
-    return self.__git_call("push", "--porcelain", remote_name, ref )
+    return self.git_call("push", "--porcelain", remote_name, ref )
 
 
   #helper function to call git commands
   #dict arg cwd is used to set where we call git commands from
-  def __git_call(self, command, *args):
+  def git_call(self, command, *args):
     comm_list = ["git",command]
     arg_list = [ item for item in args ]
     comm_list += arg_list

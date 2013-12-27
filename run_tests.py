@@ -2,10 +2,13 @@
 
 import cfarm
 
+from fabric.context_managers import lcd as fabric_lcd
+from fabric.api import local as fabric_local
+
 from fabric.api import env as fabric_env
 fabric_env.use_ssh_config = True
 
-class FakeRepo:
+class FakeRepo(object):
   def __init__(self,fake_path):
     self.path = fake_path
 
@@ -17,7 +20,7 @@ class NoCheckRepo(cfarm.git.Repo):
     self.path = path #setup path for project_root
 
   def init(self):
-    return self.__git_call("init")
+    return self.git_call("init", ".")
 
 
 #verify that we can do a simple test
@@ -45,15 +48,22 @@ if('local' in workers):
   #verify that we can create a bare repo
   #this is serial code
   remote_repo = cfarm.git.RemoteRepo(remote_worker)
-  remote_repo.create_bare()
+  remote_repo.create()
   remote_repo.install_hooks()
 
   #hook up a local repo to have that remote
+  #issue is we need to create the repo first
   new_repo = NoCheckRepo("./tests/dummy_repo")
   new_repo.init()
 
   #need to construct a remote url
-  new_repo.add_remote(remote_worker.name, remote_worker.git_url)
+  worker_host_name = remote_worker.connection_name
+  worker_path = remote_repo.git_location #need the git repo not src dir
+
+  #construct the full remote url
+  remote_url = worker_host_name + ":" + worker_path
+
+  new_repo.add_remote(remote_worker.name, remote_url)
 
 
 
