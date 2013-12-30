@@ -95,6 +95,7 @@ def main(argv):
 
   #setup arg function table
   commands = {
+    'configure':farm.setup, #i am lazy and keep using cmake terminology
     'setup':farm.setup,
     'build':farm.build,
     'test':farm.test
