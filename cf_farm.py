@@ -19,11 +19,11 @@ from fabric.api import open_shell as fabric_shell
 from fabric.api import prompt as fabric_prompt
 from fabric.context_managers import cd as fabric_rcd
 from fabric.context_managers import settings as fabric_settings
-from fabric.tasks import execute as fabric_execute
 from fabric.context_managers import hide,show
 
 import cf_worker
 import cf_git
+import cf_execute
 
 
 class Farm(object):
@@ -92,7 +92,41 @@ class Farm(object):
 
       #now get cfarm to remote into the build
       #directory and run ccmake
-      fabric_execute(self.__configure, worker, host=worker_host_name)
+      cf_execute.execute(self.__configure, worker = worker, host=worker_host_name)
+    return True
+
+  def build(self, worker_names, user_build_args):
+    user_args = " ".join(user_build_args)
+    workers = self.push(worker_names)
+
+    if workers == None:
+      return False
+
+    host_list = [name for name in workers]
+
+    #fabric by default treats hosts as unique, and if you have multiple jobs
+    #that use the same hostname they are all passed to that fabric worker.
+    #what we do is inject our own fabric_execut that pulls in more env
+    #settings to create a 2 way mapping from worker names to fabric connections
+    with fabric_settings(parallel=True):
+      cf_execute.execute(self.__build, hosts=host_list, workers=workers, user_args=user_args)
+    return True
+
+  def test(self, worker_names, user_test_args):
+    user_args = " ".join(user_test_args)
+
+    workers = self.push(worker_names)
+    if workers == None:
+      return False
+
+    host_list = [name for name in workers]
+
+    #fabric by default treats hosts as unique, and if you have multiple jobs
+    #that use the same hostname they are all passed to that fabric worker.
+    #what we do is inject our own fabric_execut that pulls in more env
+    #settings to create a 2 way mapping from worker names to fabric connections
+    with fabric_settings(parallel=True):
+      cf_execute.execute(self.__test, hosts=host_list, workers=workers, user_args=user_args)
     return True
 
   def __configure(self, worker):
@@ -108,86 +142,54 @@ class Farm(object):
       with fabric_rcd(worker.build_location):
         fabric_run(command)
 
-
-  def build(self, worker_names, user_build_args):
-    user_args = " ".join(user_build_args)
-
-    workers = self.push(worker_names)
-    if workers:
-      #if we have multiple workers that use the same host,
-      #that host will build each of those workers sequentially
-      host_list = [w.connection_name for w in workers]
-      with fabric_settings(parallel=True):
-        fabric_execute(self.__build, workers, user_args, hosts=host_list)
-      return True
-    return False
-
-  def __build(self, workers, user_args):
+  def __build(self, worker, user_args):
     my_host_name = fabric_env.host
 
-    valid_workers = [w for w in workers if w.hostname == my_host_name]
-    for w in valid_workers:
-      print 'building on worker:', w.name
+    print 'building on worker:', worker.name
 
-      #add the build flags to the front of the tool args
-      #if they exist
-      tool_args = ""
-      if w.build_flags != None:
-        tool_args = w.build_flags
+    #add the build flags to the front of the tool args
+    #if they exist
+    tool_args = ""
+    if worker.build_flags != None:
+      tool_args = worker.build_flags
 
-      config_type = ""
-      if w.build_configuration != None:
-        config_type = w.build_configuration
+    config_type = ""
+    if worker.build_configuration != None:
+      config_type = worker.build_configuration
 
-      with fabric_rcd(w.build_location):
-        #don't make a failed build a reason to abort
-        with fabric_settings(warn_only=True):
-          #build up build command
-          command = "cmake --build ."
-          if len(config_type) > 0:
-            command += " " + config_type
-          if len(user_args) > 0:
-            command += " " + user_args
-          if len(tool_args) > 0:
-            command += " -- " + tool_args
+    with fabric_rcd(worker.build_location):
+      #don't make a failed build a reason to abort
+      with fabric_settings(warn_only=True):
+        #build up build command
+        command = "cmake --build ."
+        if len(config_type) > 0:
+          command += " " + config_type
+        if len(user_args) > 0:
+          command += " " + user_args
+        if len(tool_args) > 0:
+          command += " -- " + tool_args
 
-          fabric_run(command)
+        fabric_run(command)
 
-
-  def test(self, worker_names, user_test_args):
-    user_args = " ".join(user_test_args)
-
-    workers = self.push(worker_names)
-    if workers:
-      #if we have multiple workers that use the same host,
-      #that host will test each of those workers sequentially
-      host_list = [w.connection_name for w in workers]
-      with fabric_settings(parallel=True):
-        fabric_execute(self.__test, workers, user_args, hosts=host_list)
-      return True
-    return False
-
-  def __test(self, workers, user_args):
+  def __test(self, worker, user_args):
     my_host_name = fabric_env.host
 
-    #better only be 1
-    valid_workers = [w for w in workers if w.hostname == my_host_name]
-    for w in valid_workers:
-      print 'testing on worker:', w.name
-      with fabric_rcd(w.build_location):
-        with fabric_settings(warn_only=True):
-          fabric_run("ctest " + user_args)
+    print 'testing on worker:', worker.name
+
+    with fabric_rcd(worker.build_location):
+      with fabric_settings(warn_only=True):
+        fabric_run("ctest " + user_args)
 
   def push(self, worker_names):
     #get the valid subset of workers from worker_names
-    workers = [self.__workers[w] for w in self.__workers if self.__workers[w].name in worker_names ]
+    workers = {k: self.__workers[k] for k in self.__workers if k in worker_names}
 
     if len(workers) == 0:
       print 'no worker found with that name'
       return None
 
-    for w in workers:
-      self.repo().push(w.name,'+HEAD:refs/heads/master')
+    for name in workers:
+      self.repo().push(name,'+HEAD:refs/heads/master')
     return workers
 
 
