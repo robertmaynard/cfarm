@@ -121,10 +121,15 @@ class RemoteRepo(object):
     fabric_execute(self.__create, host=self.connection_name)
 
   def __create(self):
-    #make the directory a git repo
-    self.run("git init " + self.src_location)
-    #move into the repo
-    with self.cd(self.git_location):
+    #first make the directory
+    with fabric_settings(warn_only=True):
+      self.run("mkdir -p " +  self.src_location)
+
+    #move into the directory and make it a git repo, and setup
+    #the hooks we need
+    with self.cd( self.src_location ):
+      self.run("git init " + self.src_location)
+    with self.cd( self.git_location ):
       self.run("git config --bool receive.denyCurrentBranch false")
       self.run("git config --path core.worktree " + self.src_location)
 
@@ -143,6 +148,10 @@ class RemoteRepo(object):
 
     #setup the destination of the hooks
     dest = os.path.join(self.git_location,'hooks/')
+
+    #make sure the hooks directory exists
+    with fabric_settings(warn_only=True):
+      self.run("mkdir -p " +  dest)
 
     #setup the template dictionary to create valid hooks
     context_dict = { }

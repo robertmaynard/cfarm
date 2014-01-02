@@ -63,7 +63,12 @@ Here is a list of optional settings for a .cdep file:
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
 to use such as Debug, or Release. Needed when you are using multi
-configuration generators like Visual Studio.
+configuration generators like Visual Studio. For example:
+
+```
+"build_generator" : "Visual Studio 9 2008 Win64",
+"build_configuration" : "Debug"
+```
 
 
 ##How to use cfarm##

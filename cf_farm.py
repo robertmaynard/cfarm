@@ -31,6 +31,7 @@ class Farm(object):
 
     #setup that we use ssh settings
     fabric_env.use_ssh_config = True
+    fabric_env.forward_agent = True
 
     self.__git_repo = repo
     self.__source_dir = os.path.join(repo.path,'.cfarm')
