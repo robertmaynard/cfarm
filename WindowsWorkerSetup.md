@@ -6,18 +6,28 @@ offer a POSIX interface. Now for windows machines this is requires some setup.
 So to setup windows farm workers I do the following:
 
 ##OpenSSH##
-You will need to install an ssh server, currently I am using freeSSHD ( http://www.freesshd.com )
-which allows you to setup a custom login. Make sure to copy your public
-key into the authentication folder, and create a user account
-that only can be accessed with public/private key instead
-of password.
+##OpenSSH##
+I install an ssh server, currently I am using copssh ( https://www.itefix.no/i2/copssh )
+which provides a very lightweight cygwin shell when remoting in.
 
-To get the user's public key to properly be detected by freeSSD you
-need to copy the public key file to the authentication folder and rename
-it to be the name of the user, and the file should have no extension.
+Once copssh is setup, you will need to add the worker user name to the
+authorized list of users allowed to log in. Next you will need to allow
+the sshd executable access through the firewall, which you do by adding
+it to the windows firewall program:
+```
+Windows FireWall
+  ->Allow a Program Through
+    ->Browse
+    ->Add ICW/Bin/sshd
+```
 
-You will need to make sure that the user that is running the sshd dameon
-has adminstrator rights, or manaully launch the server as admin.
+The version of copssh I setup was missing cygattr-1.dll, which can
+be fixed by downloading:
+```
+cygwin.cybermirror.org/release/attr/libattr1/libattr1-2.4.43-1.tar.bz2
+```
+and placing the dll's into the Bin folder
+
 
 ##Shell##
 
@@ -30,8 +40,18 @@ C:\Windows\SysWOW64\cmd.exe /c ""C:\Program Files (x86)\Git\bin\sh.exe" --login"
 This will give
 
 ##Git##
-Since you changed your shell to be sh.exe you don't need to do anything
-else here.
+
+Next up is to properly expose git to the cygwin shell. If you have a different
+openssh server, or are using a full cygwin shell you can most likely install
+git through that.
+
+In my case I have msysgit on the machine already and don't want a second
+git. So all I did was copied git.exe from msysgit and dropped it into the
+Bin folder of ICW. You will need to also copy libiconv-2.dll also to the Bin
+folder for git to worker properly.
+
+We do this over setting up a bash_rc alias as aliases are not currently executed
+as we don't use an interactive shell
 
 ##CMake##
 
@@ -77,6 +97,11 @@ For the Ninja generator we need a way to tell the shell how to
 get the proper visual studio enviornment variables. Currently
 I don't know of a way to get this to work seemlessly inside cfarm.
 
+### With Copssd ###
+
+
+
+### With FreeSSH###
 Instead what we can do is setup a freeSSHD to have a given
 visual studio compiler enviornment loaded. While this isn't perfect
 since we can't give each user a shell, it is a good start.
