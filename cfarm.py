@@ -70,6 +70,10 @@ def find_git_repo(path):
   repo = git.Repo(path)
   if not repo.path:
     root_path = cmake.get_project_root(path)
+    if root_path == None:
+      long_usage()
+      print 'no git repo found'
+      exit(2)
     repo = git.Repo(root_path)
   return repo
 
