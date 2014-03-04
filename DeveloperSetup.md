@@ -1,6 +1,6 @@
 #How to setup machine to use cfarm#
 
-#OSX#
+#OSX and Unix#
 
 First we need to setup a stable python platform for python, this means
 getting pip the python package manager, and virtual env which isolates
