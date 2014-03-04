@@ -31,7 +31,7 @@ So lets go install cfarm's requirements.
 
 
 ```
-env/bin/pip -r requirements.txt
+env/bin/pip install -r requirements.txt
 ```
 
 And now your virtualenv has all of cfarm requirements and you can start
