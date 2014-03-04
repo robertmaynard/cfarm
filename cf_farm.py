@@ -104,13 +104,18 @@ class Farm(object):
       return False
 
     host_list = [name for name in workers]
+    is_parallel = len(host_list) > 1
 
-    #fabric by default treats hosts as unique, and if you have multiple jobs
-    #that use the same hostname they are all passed to that fabric worker.
-    #what we do is inject our own fabric_execut that pulls in more env
-    #settings to create a 2 way mapping from worker names to fabric connections
-    with fabric_settings(parallel=True):
-      cf_execute.execute(self.__build, hosts=host_list, workers=workers, user_args=user_args)
+    if(is_parallel):
+      #fabric by default treats hosts as unique, and if you have multiple jobs
+      #that use the same hostname they are all passed to that fabric worker.
+      #what we do is inject our own fabric_execut that pulls in more env
+      #settings to create a 2 way mapping from worker names to fabric connections
+      with fabric_settings(parallel=True):
+        cf_execute.execute(self.__build, hosts=host_list, workers=workers, user_args=user_args)
+    else:
+      w = workers[host_list[0]]
+      cf_execute.execute(self.__build, hosts=w.connection_name, worker=w, user_args=user_args)
     return True
 
   def test(self, worker_names, user_test_args):
@@ -121,13 +126,18 @@ class Farm(object):
       return False
 
     host_list = [name for name in workers]
+    is_parallel = len(host_list) > 1
 
-    #fabric by default treats hosts as unique, and if you have multiple jobs
-    #that use the same hostname they are all passed to that fabric worker.
-    #what we do is inject our own fabric_execut that pulls in more env
-    #settings to create a 2 way mapping from worker names to fabric connections
-    with fabric_settings(parallel=True):
-      cf_execute.execute(self.__test, hosts=host_list, workers=workers, user_args=user_args)
+    if(is_parallel):
+      #fabric by default treats hosts as unique, and if you have multiple jobs
+      #that use the same hostname they are all passed to that fabric worker.
+      #what we do is inject our own fabric_execut that pulls in more env
+      #settings to create a 2 way mapping from worker names to fabric connections
+      with fabric_settings(parallel=True):
+        cf_execute.execute(self.__test, hosts=host_list, workers=workers, user_args=user_args)
+    else:
+      w = workers[host_list[0]]
+      cf_execute.execute(self.__test, hosts=w.connection_name, worker=w, user_args=user_args)
     return True
 
   def __configure(self, worker):
