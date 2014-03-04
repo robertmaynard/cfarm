@@ -7,8 +7,8 @@ getting pip the python package manager, and virtual env which isolates
 projects python libraries.
 
 ```
-sudo install pip
-sudo install virtualenv
+sudo easy_install pip
+sudo pip install virtualenv
 ```
 
 Next we need to create a new virtual env of python for cfarm. I personally
@@ -36,3 +36,10 @@ env/bin/pip -r requirements.txt
 
 And now your virtualenv has all of cfarm requirements and you can start
 developing!
+
+Now to setup an alias to call cfarm:
+```
+<path_to_cfarm>/env/bin/python <path_to_cfarm>/cfarm.py $*
+```
+
+
