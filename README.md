@@ -60,6 +60,8 @@ All CMake generators are currently supported. For Generators like Visual Studio
 you will also need to specify the option build_configuration option.
 
 Here is a list of optional settings for a .cdep file:
+- c_compiler : Absolute path to the c compiler
+- cpp_compiler : Absolute path to the c++ compiler
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
 to use such as Debug, or Release. Needed when you are using multi
@@ -69,7 +71,6 @@ configuration generators like Visual Studio. For example:
 "build_generator" : "Visual Studio 9 2008 Win64",
 "build_configuration" : "Debug"
 ```
-
 
 ##How to use cfarm##
 

@@ -22,6 +22,41 @@ class Worker(object):
     #that way we can have multiple workers per host
     self.name,ext = os.path.splitext(os.path.basename(path))
 
+  def generateSetupCommand(self, is_interactive):
+    command = "cmake"
+    if(is_interactive):
+      command = "ccmake"
+
+    if(self.build_generator):
+      command += " -G " + self.build_generator
+
+    if(self.build_configuration):
+      command += " -DCMAKE_BUILD_TYPE:STRING="+self.build_configuration
+
+    if(self.cpp_compiler):
+      command += " -DMAKE_CXX_COMPILER:FILEPATH="+self.cpp_compiler
+
+    if(self.c_compiler):
+      command += " -DMAKE_C_COMPILER:FILEPATH="+self.c_compiler
+
+    return command + " " + self.src_location
+
+  def generateBuildCommand(self, user_args):
+    #add the build flags to the front of the tool args if they exist
+    command = "cmake --build ."
+    if self.build_configuration:
+      #always pass the build configuration so that we handle mulit-config
+      #generators
+      command += " --config " + self.build_configuration
+    if len(user_args) > 0:
+      command += " " + user_args
+    if self.build_flags != None:
+      command += " -- " + self.build_flags
+    return command
+
+  def generateTestCommand(self, user_args):
+    return "ctest " + user_args
+
 
   def __read_worker(self,path):
     f = open(path,'r')
@@ -30,6 +65,8 @@ class Worker(object):
     #give optional arguments default values of nothing
     self.build_flags = None
     self.build_configuration = None
+    self.c_compiler = None
+    self.cpp_compiler = None
 
     #now assign the properties in the json file as member variables of
     #the class

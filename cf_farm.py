@@ -93,7 +93,7 @@ class Farm(object):
 
       #now get cfarm to remote into the build
       #directory and run ccmake
-      cf_execute.execute(self.__configure, worker = worker, host=worker_host_name)
+      cf_execute.execute(self.__setup, worker = worker, host=worker_host_name)
     return True
 
   def build(self, worker_names, user_build_args):
@@ -140,46 +140,27 @@ class Farm(object):
       cf_execute.execute(self.__test, hosts=w.connection_name, worker=w, user_args=user_args)
     return True
 
-  def __configure(self, worker):
+  def __setup(self, worker):
     #make directory first
     with fabric_settings(warn_only=True):
       command = "mkdir " +  worker.build_location
       fabric_run(command)
 
-    #run ccmake if the user wants
+    #run ccmake / cmake depending on user input
     run_configure = fabric_prompt('Would you like to run ccmake: ', default='y', validate=r'^(y|n)$')
-    if(run_configure == 'y'):
-      command = "ccmake -G " + worker.build_generator + " " + worker.src_location
-      with fabric_rcd(worker.build_location):
-        fabric_run(command)
+    command = worker.generateSetupCommand(is_interactive=(run_configure=='y'))
+    with fabric_rcd(worker.build_location):
+      fabric_run(command)
 
   def __build(self, worker, user_args):
     my_host_name = fabric_env.host
 
     print 'building on worker:', worker.name
 
-    #add the build flags to the front of the tool args
-    #if they exist
-    tool_args = ""
-    if worker.build_flags != None:
-      tool_args = worker.build_flags
-
-    config_type = ""
-    if worker.build_configuration != None:
-      config_type = worker.build_configuration
-
     with fabric_rcd(worker.build_location):
       #don't make a failed build a reason to abort
       with fabric_settings(warn_only=True):
-        #build up build command
-        command = "cmake --build ."
-        if len(config_type) > 0:
-          command += " " + config_type
-        if len(user_args) > 0:
-          command += " " + user_args
-        if len(tool_args) > 0:
-          command += " -- " + tool_args
-
+        command = worker.generateBuildCommand(user_args)
         fabric_run(command)
 
   def __test(self, worker, user_args):
@@ -189,7 +170,9 @@ class Farm(object):
 
     with fabric_rcd(worker.build_location):
       with fabric_settings(warn_only=True):
-        fabric_run("ctest " + user_args)
+        command = worker.generateTestCommand(user_args)
+        fabric_run(command)
+
 
   def push(self, worker_names):
     #get the valid subset of workers from worker_names
