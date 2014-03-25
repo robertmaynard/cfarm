@@ -28,7 +28,7 @@ class Worker(object):
       command = "ccmake"
 
     if(self.build_generator):
-      command += " -G " + self.build_generator
+      command += " -G '" + self.build_generator +"'"
 
     if(self.build_configuration):
       command += " -DCMAKE_BUILD_TYPE:STRING="+self.build_configuration
