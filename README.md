@@ -43,6 +43,7 @@ that point to the same physical machine. Here is an example .cdep file:
 {
 "hostname" : "bigboard",
 "user" : "hiro",
+"cpp_compiler" : "/usr/bin/g++-4.6",
 "src_location" : "/home/hiro/Work/bigboard/src",
 "build_location" : "/home/hiro/Work/bigboard/build",
 "build_generator" : "Ninja",
@@ -67,10 +68,10 @@ Here is a list of optional settings for a .cdep file:
 to use such as Debug, or Release. Needed when you are using multi
 configuration generators like Visual Studio. For example:
 
-```
-"build_generator" : "Visual Studio 9 2008 Win64",
-"build_configuration" : "Debug"
-```
+  ```
+  "build_generator" : "Visual Studio 9 2008 Win64",
+  "build_configuration" : "Debug"
+  ```
 
 ##How to use cfarm##
 
