@@ -143,7 +143,7 @@ class Farm(object):
   def __setup(self, worker):
     #make directory first
     with fabric_settings(warn_only=True):
-      command = "mkdir " +  worker.build_location
+      command = "mkdir -p " +  worker.build_location
       fabric_run(command)
 
     #run ccmake / cmake depending on user input
