@@ -34,10 +34,10 @@ class Worker(object):
       command += " -DCMAKE_BUILD_TYPE:STRING="+self.build_configuration
 
     if(self.cpp_compiler):
-      command += " -DMAKE_CXX_COMPILER:FILEPATH="+self.cpp_compiler
+      command += " -DCMAKE_CXX_COMPILER:FILEPATH="+self.cpp_compiler
 
     if(self.c_compiler):
-      command += " -DMAKE_C_COMPILER:FILEPATH="+self.c_compiler
+      command += " -DCMAKE_C_COMPILER:FILEPATH="+self.c_compiler
 
     return command + " " + self.src_location
 
