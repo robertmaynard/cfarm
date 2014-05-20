@@ -63,13 +63,19 @@ you will also need to specify the option build_configuration option.
 Here is a list of optional settings for a .cdep file:
 - c_compiler : Absolute path to the c compiler
 - cpp_compiler : Absolute path to the c++ compiler
+- library_type : State if you want to build Statically or Shared.
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
 to use such as Debug, or Release. Needed when you are using multi
-configuration generators like Visual Studio. For example:
+configuration generators like Visual Studio.
+
+Here are example of all the optional settings:
 
   ```
-  "build_generator" : "Visual Studio 9 2008 Win64",
+  "c_compiler" : "/usr/bin/gcc-4.8",
+  "cpp_compiler" : "/usr/bin/g++-4.8",
+  "library_type" : "Shared",
+  "build_flags" : "-j8",
   "build_configuration" : "Debug"
   ```
 

@@ -39,6 +39,15 @@ class Worker(object):
     if(self.c_compiler):
       command += " -DCMAKE_C_COMPILER:FILEPATH="+self.c_compiler
 
+    if(self.library_type):
+      #if somebody passes us not static or shared we disable the option
+      lib_type="DBUILD_SHARED_LIBS_NOT_FOUND"
+      if(self.library_type.lower() == "static"):
+        lib_type="FALSE"
+      elif(self.library_type.lower() == "shared"):
+        lib_type="TRUE"
+      command += " -DBUILD_SHARED_LIBS:BOOL="+lib_type
+
     return command + " " + self.src_location
 
   def generateBuildCommand(self, user_args):
@@ -67,6 +76,7 @@ class Worker(object):
     self.build_configuration = None
     self.c_compiler = None
     self.cpp_compiler = None
+    self.library_type = None
 
     #now assign the properties in the json file as member variables of
     #the class
