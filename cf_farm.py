@@ -194,14 +194,20 @@ class Farm(object):
     def full_path(file):
       return os.path.join(self.__source_dir,file)
 
-    def make_worker(path):
-      return cf_worker.Worker(path)
-
     for root, dirs, files in os.walk(self.__source_dir):
       dirs = []
       valid_files = filter(valid_ext, files)
       full_paths = map(full_path, valid_files)
-      workers = map(make_worker, full_paths)
+
+      #the current issues is that we expect a worker name to map
+      #to a single instance, if we push all the workers under a matrix
+      #into a single list this will fail, so we need to teach this
+      #class that a worker name maps to a worker matrix and we need
+      #to setup, build, and test on each of these items
+      workers = []
+      for p in full_paths:
+        wm = cf_worker.WorkerMatrix(p)
+        workers.append(wm)
 
       self.__workers = {}
       for w in workers:
