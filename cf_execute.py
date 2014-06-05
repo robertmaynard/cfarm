@@ -17,6 +17,9 @@ import inspect
 import sys
 import textwrap
 
+#must come before any fabric api
+import cf_fabric_patches
+
 from fabric import state
 from fabric.utils import abort, warn, error
 from fabric.network import to_dict, normalize_to_string, disconnect_all
@@ -25,6 +28,7 @@ from fabric.job_queue import JobQueue
 from fabric.task_utils import crawl, merge, parse_kwargs
 from fabric.exceptions import NetworkError
 from fabric.api import env
+
 
 #this is a override for the fabric _execute method which allows us
 #to have multiple connections to the same host. We want this to happen
@@ -79,6 +83,7 @@ def _execute(task, host, my_env, args, kwargs, jobs, queue, multiprocessing):
             #host_string which is always the actual connection_name
             env['host_string'] = worker.connection_name
             state.env.update(env)
+
             def submit(result):
                 queue.put({'name': name, 'result': result})
             try:

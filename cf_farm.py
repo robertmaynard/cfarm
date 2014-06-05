@@ -13,6 +13,9 @@
 import os
 import os.path
 
+#must come before any fabric api
+import cf_fabric_patches
+
 from fabric.api import env as fabric_env
 from fabric.api import run as fabric_run
 from fabric.api import open_shell as fabric_shell
@@ -24,6 +27,7 @@ from fabric.context_managers import hide,show
 import cf_worker
 import cf_git
 import cf_execute
+
 
 
 class Farm(object):
@@ -141,6 +145,8 @@ class Farm(object):
     return True
 
   def __setup(self, worker):
+    fabric_env['pretty_host_string'] = worker.pretty_name
+
     #make directory first
     with fabric_settings(warn_only=True):
       command = "mkdir -p " +  worker.build_location
@@ -153,10 +159,7 @@ class Farm(object):
       fabric_run(command)
 
   def __build(self, worker, user_args):
-    my_host_name = fabric_env.host
-
-    print 'building on worker:', worker.name
-
+    fabric_env['pretty_host_string'] = worker.pretty_name
     with fabric_rcd(worker.build_location):
       #don't make a failed build a reason to abort
       with fabric_settings(warn_only=True):
@@ -164,10 +167,7 @@ class Farm(object):
         fabric_run(command)
 
   def __test(self, worker, user_args):
-    my_host_name = fabric_env.host
-
-    print 'testing on worker:', worker.name
-
+    fabric_env['pretty_host_string'] = worker.pretty_name
     with fabric_rcd(worker.build_location):
       with fabric_settings(warn_only=True):
         command = worker.generateTestCommand(user_args)

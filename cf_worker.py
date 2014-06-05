@@ -22,6 +22,9 @@ class Worker(object):
     #that way we can have multiple workers per host
     self.name,ext = os.path.splitext(os.path.basename(path))
 
+    #add support for a pretty name to the work
+    self.pretty_name = self.name
+
   def generateSetupCommand(self, is_interactive):
     command = "cmake"
     if(is_interactive):

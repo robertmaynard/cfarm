@@ -11,6 +11,8 @@
 #
 #=============================================================================
 
+#must come before any fabric api
+import cf_fabric_patches
 
 from fabric.api import local as fabric_local
 from fabric.api import run as fabric_remote
