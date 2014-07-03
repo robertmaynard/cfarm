@@ -53,9 +53,9 @@ through the entire configuration, compilation, test process.</p>
 <h2>
 <a name="setup-development-machine" class="anchor" href="#setup-development-machine"><span class="octicon octicon-link"></span></a>Setup Development Machine</h2>
 
-<p>To use CFarm you need a setup a configuration per project. This is
+<p>To use cfarm you need a setup a configuration per project. This is
 done by creating a .cfarm folder in the root of your git repo that
-you want CFarm to work on (Yes CFarm only supports git, I said CFarm
+you want cfarm to work on (Yes cfarm only supports git, I said cfarm
 has no features).</p>
 
 <p>The folder will look something like:</p>
@@ -67,12 +67,13 @@ has no features).</p>
 </code></pre>
 
 <p>Each .cdep file will describe how to deploy the project to a machine.
-Each file name is the CFarm workers name, allowing you to have multiple workers
+Each file name is the cfarm workers name, allowing you to have multiple workers
 that point to the same physical machine. Here is an example .cdep file:</p>
 
 <pre><code>{
 "hostname" : "bigboard",
 "user" : "hiro",
+"cpp_compiler" : "/usr/bin/g++-4.6",
 "src_location" : "/home/hiro/Work/bigboard/src",
 "build_location" : "/home/hiro/Work/bigboard/build",
 "build_generator" : "Ninja",
@@ -93,14 +94,26 @@ you will also need to specify the option build_configuration option.</li>
 </ul><p>Here is a list of optional settings for a .cdep file:</p>
 
 <ul>
+<li>c_compiler : Absolute path to the c compiler</li>
+<li>cpp_compiler : Absolute path to the c++ compiler</li>
+<li>library_type : State if you want to build Statically or Shared.</li>
 <li>build_flags = list of flags for compilation, generally holds '-j'</li>
 <li>build_configuration = Explicitly state the build configuration type
 to use such as Debug, or Release. Needed when you are using multi
 configuration generators like Visual Studio.</li>
-</ul><h2>
-<a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use CFarm</h2>
+</ul><p>Here are example of all the optional settings:</p>
 
-<p>CFarm understands the concepts of setup, build, and test.</p>
+<pre><code>  "c_compiler" : "/usr/bin/gcc-4.8",
+  "cpp_compiler" : "/usr/bin/g++-4.8",
+  "library_type" : "Shared",
+  "build_flags" : "-j8",
+  "build_configuration" : "Debug"
+</code></pre>
+
+<h2>
+<a name="how-to-use-cfarm" class="anchor" href="#how-to-use-cfarm"><span class="octicon octicon-link"></span></a>How to use cfarm</h2>
+
+<p>cfarm understands the concepts of setup, build, and test.</p>
 
 <p>The Setup command looks like:</p>
 
@@ -121,7 +134,7 @@ configure options</p>
  cfarm test bigboard metaverse
 </code></pre>
 
-<p>CFarm also allows you to sent options down to the workers at build
+<p>cfarm also allows you to sent options down to the workers at build
 and test time, it does this by sending all arguments passed after the
 first '--' down to the command line.</p>
 
