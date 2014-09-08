@@ -13,6 +13,7 @@
 #=============================================================================
 
 import sys
+import fnmatch
 
 #import our helper functions
 import cf_git as git
@@ -94,7 +95,6 @@ def init_farm(working_dir):
   return f
 
 def main(argv):
-
   farm = init_farm(".")
 
   #setup arg function table
@@ -127,20 +127,28 @@ def main(argv):
     if len(argv) > arg_index+1:
       args = argv[arg_index+1:]
 
-  #support all by looking for it first and replacing
-  #the rest of the argv with just all known worker names
+  #now check for the magic all name, and handle worker unix style globbing
   if 'all' in wnames:
+    #support all by looking for it first and replacing
+    #the rest of the argv with just all known worker names
     wnames = all_worker_names
+  else:
+    #check each worker name to see if it is a unix style globbing
+    all_matching = []
+    for pattern in wnames:
+      matching = fnmatch.filter(all_worker_names,pattern)
+      all_matching += matching
+    unique = set(all_matching)
+    wnames = list(unique)
 
-  #call the correct function
-  if argv[0] == 'help':
-    short_usage( all_worker_names )
-  elif argv[0] in commands:
+  #call the correct function with the updated worker names
+  if argv[0] in commands:
     commands[argv[0]]( wnames, args )
+  elif argv[0] == 'help':
+    short_usage( all_worker_names )
   else:
     short_usage( all_worker_names )
     sys.exit(2)
-
 
 if __name__ == '__main__':
   main(sys.argv[1:])
