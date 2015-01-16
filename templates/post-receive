@@ -24,3 +24,7 @@ git checkout --force
 
 # Force update submodules
 git submodule update --init --recursive --force
+
+# remove any files that have stuck around, this can
+# happen if a submodule has moved locations
+git clean -f -d
