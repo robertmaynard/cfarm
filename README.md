@@ -94,14 +94,17 @@ currently launch ccmake on the machine to allow you to configure the starting
 building options. Todo: Allow the user to resetup a machine to switch just
 configure options
 
-The build and test command have two ways to be called:
+The build and test command have three ways to be called:
 
 ```
  cfarm build all
  cfarm build deliverator
+ cfarm build d*
 
  cfarm test all
  cfarm test bigboard metaverse
+ cfarm test b* meta*
+
 ```
 
 cfarm also allows you to sent options down to the workers at build
