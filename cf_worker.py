@@ -56,13 +56,13 @@ class Worker(object):
       command += " -DCMAKE_CUDA_HOST_COMPILER:FILEPATH="+self.cuda_compiler
 
     if(self.c_flags):
-      command += " -DCMAKE_C_FLAGS:STRING="+self.c_flags
+      command += " -DCMAKE_C_FLAGS:STRING='"+self.c_flags+"'"
 
     if(self.cpp_flags):
-      command += " -DCMAKE_CXX_FLAGS:STRING="+self.cpp_flags
+      command += " -DCMAKE_CXX_FLAGS:STRING='"+self.cpp_flags+"'"
 
     if(self.cuda_flags):
-      command += " -DCMAKE_CUDA_FLAGS:STRING="+self.cuda_flags
+      command += " -DCMAKE_CUDA_FLAGS:STRING='"+self.cuda_flags+"'"
 
     if(self.library_type):
       #if somebody passes us not static or shared we disable the option
