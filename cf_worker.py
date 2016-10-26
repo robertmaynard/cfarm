@@ -42,6 +42,21 @@ class Worker(object):
     if(self.c_compiler):
       command += " -DCMAKE_C_COMPILER:FILEPATH="+self.c_compiler
 
+    if(self.cuda_compiler):
+      command += " -DCMAKE_CUDA_COMPILER:FILEPATH="+self.cuda_compiler
+
+    if(self.cuda_host_compiler):
+      command += " -DCMAKE_CUDA_HOST_COMPILER:FILEPATH="+self.cuda_compiler
+
+    if(self.c_flags):
+      command += " -DCMAKE_C_FLAGS:STRING="+self.c_flags
+
+    if(self.cpp_flags):
+      command += " -DCMAKE_CXX_FLAGS:STRING="+self.cpp_flags
+
+    if(self.cuda_flags):
+      command += " -DCMAKE_CUDA_FLAGS:STRING="+self.cuda_flags
+
     if(self.library_type):
       #if somebody passes us not static or shared we disable the option
       lib_type="DBUILD_SHARED_LIBS_NOT_FOUND"
@@ -79,6 +94,13 @@ class Worker(object):
     self.build_configuration = None
     self.c_compiler = None
     self.cpp_compiler = None
+    self.cuda_compiler = None
+    self.cuda_host_compiler = None
+
+    self.c_flags = None
+    self.cpp_flags = None
+    self.cuda_flags = None
+
     self.library_type = None
 
     #now assign the properties in the json file as member variables of
