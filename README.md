@@ -66,7 +66,7 @@ Here is a list of optional settings for a .cdep file:
 - cpp_compiler : Absolute path to the c++ compiler
 - cuda_compiler : Absolute path to the cuda compiler
 - cuda_host_compiler : Absolute path to the cuda host compiler
-_ <lang>_flags : default flags for the C/C++/CUDA language
+- <lang>_flags : default flags for the C/C++/CUDA language
 - library_type : State if you want to build Statically or Shared.
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
