@@ -61,6 +61,7 @@ All CMake generators are currently supported. For Generators like Visual Studio
 you will also need to specify the option build_configuration option.
 
 Here is a list of optional settings for a .cdep file:
+- cmake_location : the location of the cmake binary
 - c_compiler : Absolute path to the c compiler
 - cpp_compiler : Absolute path to the c++ compiler
 - cuda_compiler : Absolute path to the cuda compiler

@@ -26,9 +26,16 @@ class Worker(object):
     self.pretty_name = self.name
 
   def generateSetupCommand(self, is_interactive):
-    command = "cmake"
+
+    command = ""
+    if(self.cmake_location):
+      command = os.path.abspath(self.cmake_location)
+
     if(is_interactive):
-      command = "ccmake"
+      command = os.path.join(command,"ccmake")
+    else:
+      command = os.path.join(command,"cmake")
+
 
     if(self.build_generator):
       command += " -G '" + self.build_generator +"'"
@@ -90,8 +97,11 @@ class Worker(object):
     j = json.load(f)
 
     #give optional arguments default values of nothing
+    self.cmake_location = None
+
     self.build_flags = None
     self.build_configuration = None
+
     self.c_compiler = None
     self.cpp_compiler = None
     self.cuda_compiler = None
