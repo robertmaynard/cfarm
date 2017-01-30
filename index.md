@@ -61,8 +61,12 @@ All CMake generators are currently supported. For Generators like Visual Studio
 you will also need to specify the option build_configuration option.
 
 Here is a list of optional settings for a .cdep file:
+- cmake_location : the location of the cmake binary
 - c_compiler : Absolute path to the c compiler
 - cpp_compiler : Absolute path to the c++ compiler
+- cuda_compiler : Absolute path to the cuda compiler
+- cuda_host_compiler : Absolute path to the cuda host compiler
+- \<lang\>_flags : default flags for the C/C++/CUDA language
 - library_type : State if you want to build Statically or Shared.
 - build_flags = list of flags for compilation, generally holds '-j<N>'
 - build_configuration = Explicitly state the build configuration type
@@ -79,7 +83,7 @@ Here are example of all the optional settings:
   "build_configuration" : "Debug"
   ```
 
-##How to use cfarm##
+##How to use CFarm##
 
 cfarm understands the concepts of setup, build, and test.
 
@@ -94,14 +98,17 @@ currently launch ccmake on the machine to allow you to configure the starting
 building options. Todo: Allow the user to resetup a machine to switch just
 configure options
 
-The build and test command have two ways to be called:
+The build and test command have three ways to be called:
 
 ```
  cfarm build all
  cfarm build deliverator
+ cfarm build d*
 
  cfarm test all
  cfarm test bigboard metaverse
+ cfarm test b* meta*
+
 ```
 
 cfarm also allows you to sent options down to the workers at build
@@ -122,12 +129,37 @@ use:
 cfarm test all -- -R UnitTestSword
 ```
 
+##CFarm and Git-LFS##
+
+cfarm has support for handling repositories that use Git-LFS. Basically
+LFS doesn't support pushing data to remotes that don't support LFS which
+covers all cfarm workers. So instead what we do is push the data to a
+thirdparty server.
+
+This is done on a per project basis by adding a ``lfs.config`` file to
+the .cfarm folder
+
+```
+.cfarm/
+  - metaverse.cdep
+  - deliverator.cdep
+  - bigboard.cdep
+  - lfs.config
+```
+
+This file will look like:
+
+```
+{
+"push_url" : "git@github.com:github.com/user/repo.git",
+"fetch_url" : "https://www.github.com/user/repo.git",
+}
+```
+
 ##Requirements##
 
 ```
 Python 2.6 or 2.7
 Fabric
 ```
-
-
 
