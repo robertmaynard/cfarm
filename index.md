@@ -28,6 +28,7 @@ you want cfarm to work on (Yes cfarm only supports git, I said cfarm
 has no features).
 
 The folder will look something like:
+
 ```
 .cfarm/
   - metaverse.cdep
@@ -75,13 +76,13 @@ configuration generators like Visual Studio.
 
 Here are example of all the optional settings:
 
-  ```
-  "c_compiler" : "/usr/bin/gcc-4.8",
-  "cpp_compiler" : "/usr/bin/g++-4.8",
-  "library_type" : "Shared",
-  "build_flags" : "-j8",
-  "build_configuration" : "Debug"
-  ```
+```
+"c_compiler" : "/usr/bin/gcc-4.8",
+"cpp_compiler" : "/usr/bin/g++-4.8",
+"library_type" : "Shared",
+"build_flags" : "-j8",
+"build_configuration" : "Debug"
+```
 
 ##How to use CFarm##
 
@@ -152,7 +153,7 @@ This file will look like:
 ```
 {
 "push_url" : "git@github.com:github.com/user/repo.git",
-"fetch_url" : "https://www.github.com/user/repo.git",
+"fetch_url" : "https://www.github.com/user/repo.git"
 }
 ```
 
