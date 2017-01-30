@@ -12,6 +12,7 @@
 
 import os
 import os.path
+import json
 
 #must come before any fabric api
 import cf_fabric_patches
@@ -40,9 +41,13 @@ class Farm(object):
     self.__git_repo = repo
     self.__source_dir = os.path.join(repo.path,'.cfarm')
 
-    self.__workers = {}
 
+    self.lfs_dict = None
+    self.__read_lfs_config()
+
+    self.__workers = {}
     self.__read_workers()
+
 
   def workers(self):
     return self.__workers
@@ -75,9 +80,11 @@ class Farm(object):
       #create a git directory under the source directory
       #setup a post-receive hook to set the working directory
       #to be equal to the source directory
-      worker_repo = cf_git.RemoteRepo(worker)
+      worker_repo = cf_git.RemoteRepo(worker, self.lfs_dict)
       worker_repo.create()
       worker_repo.install_hooks()
+
+
       #
       #now we have to add the worker as a git remote
       #remote url looks like username@host:path/to/repository.git
@@ -91,6 +98,10 @@ class Farm(object):
       #first remove the remote in case it already exists and we need
       #to change the url, and than add it
       self.repo().add_remote(worker_name,remote_url)
+
+      #setup lfs endpoint for the remote
+      self.repo().add_lfs_endpoint(worker_name, self.lfs_dict)
+
 
       #push current head as a starting point
       self.repo().push(worker_name,'+HEAD:refs/heads/master')
@@ -186,6 +197,23 @@ class Farm(object):
       self.repo().push(name,'+HEAD:refs/heads/master')
     return workers
 
+  def __read_lfs_config(self):
+    def valid_config(file):
+      return file == "lfs.config"
+
+    def full_path(file):
+      return os.path.join(self.__source_dir,file)
+
+    for root, dirs, files in os.walk(self.__source_dir):
+      dirs = []
+      config_file = None
+      for f in files:
+        if f == "lfs.config":
+          config_file = full_path(f)
+
+      if config_file:
+        f = open(config_file,'r')
+        self.lfs_dict = json.load(f)
 
   def __read_workers(self):
     def valid_ext(file):

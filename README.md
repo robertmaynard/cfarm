@@ -83,7 +83,7 @@ Here are example of all the optional settings:
   "build_configuration" : "Debug"
   ```
 
-##How to use cfarm##
+##How to use CFarm##
 
 cfarm understands the concepts of setup, build, and test.
 
@@ -127,6 +127,33 @@ use:
 
 ```
 cfarm test all -- -R UnitTestSword
+```
+
+##CFarm and Git-LFS##
+
+cfarm has support for handling repositories that use Git-LFS. Basically
+LFS doesn't support pushing data to remotes that don't support LFS which
+covers all cfarm workers. So instead what we do is push the data to a
+thirdparty server.
+
+This is done on a per project basis by adding a ``lfs.config`` file to
+the .cfarm folder
+
+```
+.cfarm/
+  - metaverse.cdep
+  - deliverator.cdep
+  - bigboard.cdep
+  - lfs.config
+```
+
+This file will look like:
+
+```
+{
+"push_url" : "git@github.com:github.com/user/repo.git",
+"fetch_url" : "https://www.github.com/user/repo.git",
+}
 ```
 
 ##Requirements##
