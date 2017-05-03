@@ -1,11 +1,11 @@
-###CFarm###
+### CFarm ###
 
 CFarm goal is to keep numerous machines in sync when developing cross platform
 C++ projects. You can think of a private continuous testing, without any fancy
 reporting, user interface, or other 'features' that other tools have.
 
 
-##Reason##
+## Reason ##
 
 The standard problem I have is when developing on a single platform,
 I introduce subtle cross platform breaking code, things like using
@@ -20,7 +20,7 @@ and every time I do that I need to recheck out the code and generally go
 through the entire configuration, compilation, test process.
 
 
-##Setup Development Machine##
+## Setup Development Machine ##
 
 To use cfarm you need a setup a configuration per project. This is
 done by creating a .cfarm folder in the root of your git repo that
@@ -84,7 +84,7 @@ Here are example of all the optional settings:
 "build_configuration" : "Debug"
 ```
 
-##How to use CFarm##
+## How to use CFarm ##
 
 cfarm understands the concepts of setup, build, and test.
 
@@ -130,7 +130,7 @@ use:
 cfarm test all -- -R UnitTestSword
 ```
 
-##CFarm and Git-LFS##
+## CFarm and Git-LF S##
 
 cfarm has support for handling repositories that use Git-LFS. Basically
 LFS doesn't support pushing data to remotes that don't support LFS which
@@ -157,7 +157,7 @@ This file will look like:
 }
 ```
 
-##Requirements##
+## Requirements ##
 
 ```
 Python 2.6 or 2.7
